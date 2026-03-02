@@ -1,0 +1,615 @@
+WiFi Connecting (Enhanced Mode)...
+.......
+WiFi Connected!
+MQTT Connecting (FreeHeap:25784)...Success.
+[Status] FAILED | N:32.0 B:31.0
+[Status] FAILED | N:32.0 B:31.0
+[Status] FAILED | N:32.0 B:31.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:30.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+
+--------------- CUT HERE FOR EXCEPTION DECODER ---------------
+
+Exception (0):
+epc1=0x402057ce epc2=0x00000000 epc3=0x00000000 excvaddr=0x00000000 depc=0x00000000
+
+>>>stack>>>
+
+ctx: cont
+sp: 3ffffe00 end: 3fffffd0 offset: 0150
+3fffff50:  00000000 00000000 3ffeea14 40206018  
+3fffff60:  00000000 3ffeec7c 00000001 3ffeeca4  
+3fffff70:  00000000 00000000 3ffef874 4020564b  
+3fffff80:  00000000 3ffeea14 00000000 40204acc  
+3fffff90:  3fffdad0 3ffeea14 3ffeea14 3ffeeca4  
+3fffffa0:  3fffdad0 00000000 3ffeea14 402017e0  
+3fffffb0:  00000000 00000000 3ffeec78 402085bc  
+3fffffc0:  feefeffe feefeffe 3fffdab0 40100e35  
+<<<stack<<<
+
+--------------- CUT HERE FOR EXCEPTION DECODER ---------------
+
+ ets Jan  8 2013,rst cause:2, boot mode:(3,6)
+
+load 0x4010f000, len 3424, room 16 
+tail 0
+chksum 0x2e
+load 0x3fff20b8, len 40, room 8 
+tail 0
+chksum 0x2b
+csum 0x2b
+v000614e0
+~ld
+����g�{��n|�l�l`b��|;�d�g��o�□$`��{�d�l��>>> [SYSTEM] Fan & LED OFF <<<
+
+WiFi Connecting (Enhanced Mode)...
+.......
+WiFi Connected!
+MQTT Connecting (FreeHeap:25784)...Success.
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+
+--------------- CUT HERE FOR EXCEPTION DECODER ---------------
+
+Exception (0):
+epc1=0x4022d45e epc2=0x00000000 epc3=0x00000000 excvaddr=0x00000000 depc=0x00000000
+
+>>>stack>>>
+
+ctx: bearssl
+sp: 3fff0d80 end: 3fff1180 offset: 0150
+3fff0ed0:  d0000000 f56622c7 795ca645 00000000  
+3fff0ee0:  420af8c3 e8d9f159 340ada31 55d6cd4b  
+3fff0ef0:  ed86df08 fc656f0c bc3549e8 50000000  
+3fff0f00:  00000000 710c92f6 da000000 7c3e4e7c  
+3fff0f10:  17db30f0 8183b2d0 033cc003 85353583  
+3fff0f20:  1cc5eaf5 ec9dee5c e2a13937 f05804a9  
+3fff0f30:  7b51e641 69a8dbdf 12f93d9e 2d3029e6  
+3fff0f40:  c1acaca1 af57a338 3a77b937 ec9c8547  
+3fff0f50:  95201a0f 82678ade fbdb1596 79bc9f48  
+3fff0f60:  f30c0c3c 1703033d 00000071 00000000  
+3fff0f70:  5303033d 00000071 44000071 1703033d  
+3fff0f80:  5303034c 00000022 bcc0c0e8 8e000000  
+3fff0f90:  00000000 bcc0c0ca 8e000000 8e000022  
+3fff0fa0:  bcc0c0e8 32c0c0ca 3c03c003 033f30fc  
+3fff0fb0:  ff0cfc30 3fcf03cc c3c0c300 cfc0fff3  
+3fff0fc0:  00000005 00000000 00000000 71000000  
+3fff0fd0:  3d030317 00000044 00000005 40102414  
+3fff0fe0:  3fff0f18 00000000 50000000 00000000  
+3fff0ff0:  f56622c7 55d6cd4b 9185571c 405026e4  
+3fff1000:  ea66cc5c 24424200 88444000 00000000  
+3fff1010:  3fff1120 3fff10c0 85353583 67940cb4  
+3fff1020:  1cc5eaf5 ec9dee5c 3a77b937 af57a338  
+3fff1030:  c1acaca1 2d3029e6 7b51e641 69a8dbdf  
+3fff1040:  82678ade fbdb1596 e2a13937 f05804a9  
+3fff1050:  12f93d9e ec9c8547 95201a0f 79bc9f48  
+3fff1060:  7f17891b 68305eb3 7c3e4e7c bc3549e8  
+3fff1070:  17db30f0 7ab3456a d0000000 00005891  
+3fff1080:  21111010 80000000 00000010 ffffffff  
+3fff1090:  402059c8 00000017 3ffef92c 3fff1120  
+3fff10a0:  3fff5f74 00003d44 3fff5e5c 40223bbd  
+3fff10b0:  00000000 68000000 00000000 20ea0100  
+3fff10c0:  00000000 71000000 3d030317 00000044  
+3fff10d0:  3fff6b81 00000000 00000000 00000000  
+3fff10e0:  00000000 00000000 00000000 00000003  
+3fff10f0:  00000000 000001ea 00000000 0000003d  
+3fff1100:  3fff5e1c 3fff6694 3fff6614 3fff6b79  
+3fff1110:  3fff1160 00003d44 3fff6b81 40223d03  
+3fff1120:  00000000 00000000 00000000 00000000  
+3fff1130:  3fff5e5c 00003d5c deadbeef 3fff691c  
+3fff1140:  00000240 0000000d 3fff5e1c 3ffeeb40  
+3fff1150:  00001388 00000000 3fff5e1c 40221440  
+3fff1160:  00003d5c deadbeef deadbeef 3ffeeb40  
+3fff1170:  00003a98 00000000 3ffef874 402059fc  
+
+ctx: cont
+sp: 3fffff20 end: 3fffffd0 offset: 0000
+3fffff20:  00001388 00000000 00000000 402052f6  
+3fffff30:  00000089 02501e13 3ffeec7c 00000000  
+3fffff40:  00000010 00000000 0001e531 00000001  
+3fffff50:  00000000 0001e531 b6c8b439 0231017b  
+3fffff60:  00000000 3ffeec7c 00000001 3ffeeca4  
+3fffff70:  3fffdad0 00000000 3ffef874 4020564b  
+3fffff80:  00000000 3ffeea14 3ffef874 402057e1  
+3fffff90:  3fffdad0 3ffeeca4 3ffeea14 4020af9d  
+3fffffa0:  3fffdad0 00000000 3ffeea14 402017d5  
+3fffffb0:  00000000 00000000 3ffeec78 402085bc  
+3fffffc0:  feefeffe feefeffe 3fffdab0 40100e35  
+<<<stack<<<
+
+--------------- CUT HERE FOR EXCEPTION DECODER ---------------
+
+ ets Jan  8 2013,rst cause:2, boot mode:(3,6)
+
+load 0x4010f000, len 3424, room 16 
+tail 0
+chksum 0x2e
+load 0x3fff20b8, len 40, room 8 
+tail 0
+chksum 0x2b
+csum 0x2b
+v000614e0
+~ld
+����n�s��g|�l�l`b��|r�l�n��'�□l`��s�l�d��>>> [SYSTEM] Fan & LED OFF <<<
+
+WiFi Connecting (Enhanced Mode)...
+.......
+WiFi Connected!
+MQTT Connecting (FreeHeap:25784)...Success.
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:29.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0
+[Status] FAILED | N:32.0 B:28.0

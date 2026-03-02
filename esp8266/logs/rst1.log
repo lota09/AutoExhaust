@@ -1,0 +1,321 @@
+
+[Error] 연결 실패! SSID와 비밀번호를 다시 확인해주세요.
+..............................
+--------------- CUT HERE FOR EXCEPTION DECODER ---------------
+
+Exception (0):
+epc1=0x4020ccf4 epc2=0x00000000 epc3=0x00000000 excvaddr=0x00000000 depc=0x00000000
+
+>>>stack>>>
+
+ctx: sys
+sp: 3fffedb0 end: 3fffffb0 offset: 0150
+3fffef00:  0000003c 00000000 3ffeca60 000000ff  
+3fffef10:  0000001c 00000001 401052a5 3ffefaec  
+3fffef20:  3fffdc80 3fffef40 3fffef44 4020badc  
+3fffef30:  3ffec880 3ffef374 3ffef78c 40233b04  
+3fffef40:  40230c5e 3fffdab0 00000002 3fffdcb0  
+3fffef50:  402305af 00000000 3ffef78c 40234e0b  
+3fffef60:  40000f49 3fffdab0 3fffdab0 40000f49  
+3fffef70:  40000e19 00042d03 bff00000 0000bfff  
+3fffef80:  00000005 aa55aa55 000000ed 40105459  
+3fffef90:  4010545f bff00000 0000bfff 022800f0  
+3fffefa0:  4010000d bff00000 00042d03 401000ab  
+3fffefb0:  40225530 3fffef4c 402254e9 3fffff18  
+3fffefc0:  3fffffd0 00000000 00000000 feefeffe  
+3fffefd0:  feefeffe feefeffe feefeffe feefeffe  
+3fffefe0:  feefeffe feefeffe feefeffe feefeffe  
+3fffeff0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff000:  feefeffe feefeffe feefeffe feefeffe  
+3ffff010:  feefeffe feefeffe feefeffe feefeffe  
+3ffff020:  feefeffe feefeffe feefeffe feefeffe  
+3ffff030:  feefeffe feefeffe feefeffe feefeffe  
+3ffff040:  feefeffe feefeffe feefeffe feefeffe  
+3ffff050:  feefeffe feefeffe feefeffe feefeffe  
+3ffff060:  feefeffe feefeffe feefeffe feefeffe  
+3ffff070:  feefeffe feefeffe feefeffe feefeffe  
+3ffff080:  feefeffe feefeffe feefeffe feefeffe  
+3ffff090:  feefeffe feefeffe feefeffe feefeffe  
+3ffff0a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff0b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff0c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff0d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff0e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff0f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff100:  feefeffe feefeffe feefeffe feefeffe  
+3ffff110:  feefeffe feefeffe feefeffe feefeffe  
+3ffff120:  feefeffe feefeffe feefeffe feefeffe  
+3ffff130:  feefeffe feefeffe feefeffe feefeffe  
+3ffff140:  feefeffe feefeffe feefeffe feefeffe  
+3ffff150:  feefeffe feefeffe feefeffe feefeffe  
+3ffff160:  feefeffe feefeffe feefeffe feefeffe  
+3ffff170:  feefeffe feefeffe feefeffe feefeffe  
+3ffff180:  feefeffe feefeffe feefeffe feefeffe  
+3ffff190:  feefeffe feefeffe feefeffe feefeffe  
+3ffff1a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff1b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff1c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff1d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff1e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff1f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff200:  feefeffe feefeffe feefeffe feefeffe  
+3ffff210:  feefeffe feefeffe feefeffe feefeffe  
+3ffff220:  feefeffe feefeffe feefeffe feefeffe  
+3ffff230:  feefeffe feefeffe feefeffe feefeffe  
+3ffff240:  feefeffe feefeffe feefeffe feefeffe  
+3ffff250:  feefeffe feefeffe feefeffe feefeffe  
+3ffff260:  feefeffe feefeffe feefeffe feefeffe  
+3ffff270:  feefeffe feefeffe feefeffe feefeffe  
+3ffff280:  feefeffe feefeffe feefeffe feefeffe  
+3ffff290:  feefeffe feefeffe feefeffe feefeffe  
+3ffff2a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff2b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff2c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff2d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff2e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff2f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff300:  feefeffe feefeffe feefeffe feefeffe  
+3ffff310:  feefeffe feefeffe feefeffe feefeffe  
+3ffff320:  feefeffe feefeffe feefeffe feefeffe  
+3ffff330:  feefeffe feefeffe feefeffe feefeffe  
+3ffff340:  feefeffe feefeffe feefeffe feefeffe  
+3ffff350:  feefeffe feefeffe feefeffe feefeffe  
+3ffff360:  feefeffe feefeffe feefeffe feefeffe  
+3ffff370:  feefeffe feefeffe feefeffe feefeffe  
+3ffff380:  feefeffe feefeffe feefeffe feefeffe  
+3ffff390:  feefeffe feefeffe feefeffe feefeffe  
+3ffff3a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff3b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff3c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff3d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff3e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff3f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff400:  feefeffe feefeffe feefeffe feefeffe  
+3ffff410:  feefeffe feefeffe feefeffe feefeffe  
+3ffff420:  feefeffe feefeffe feefeffe feefeffe  
+3ffff430:  feefeffe feefeffe feefeffe feefeffe  
+3ffff440:  feefeffe feefeffe feefeffe feefeffe  
+3ffff450:  feefeffe feefeffe feefeffe feefeffe  
+3ffff460:  feefeffe feefeffe feefeffe feefeffe  
+3ffff470:  feefeffe feefeffe feefeffe feefeffe  
+3ffff480:  feefeffe feefeffe feefeffe feefeffe  
+3ffff490:  feefeffe feefeffe feefeffe feefeffe  
+3ffff4a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff4b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff4c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff4d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff4e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff4f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff500:  feefeffe feefeffe feefeffe feefeffe  
+3ffff510:  feefeffe feefeffe feefeffe feefeffe  
+3ffff520:  feefeffe feefeffe feefeffe feefeffe  
+3ffff530:  feefeffe feefeffe feefeffe feefeffe  
+3ffff540:  feefeffe feefeffe feefeffe feefeffe  
+3ffff550:  feefeffe feefeffe feefeffe feefeffe  
+3ffff560:  feefeffe feefeffe feefeffe feefeffe  
+3ffff570:  feefeffe feefeffe feefeffe feefeffe  
+3ffff580:  feefeffe feefeffe feefeffe feefeffe  
+3ffff590:  feefeffe feefeffe feefeffe feefeffe  
+3ffff5a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff5b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff5c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff5d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff5e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff5f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff600:  feefeffe feefeffe feefeffe feefeffe  
+3ffff610:  feefeffe feefeffe feefeffe feefeffe  
+3ffff620:  feefeffe feefeffe feefeffe feefeffe  
+3ffff630:  feefeffe feefeffe feefeffe feefeffe  
+3ffff640:  feefeffe feefeffe feefeffe feefeffe  
+3ffff650:  feefeffe feefeffe feefeffe feefeffe  
+3ffff660:  feefeffe feefeffe feefeffe feefeffe  
+3ffff670:  feefeffe feefeffe feefeffe feefeffe  
+3ffff680:  feefeffe feefeffe feefeffe feefeffe  
+3ffff690:  feefeffe feefeffe feefeffe feefeffe  
+3ffff6a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff6b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff6c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff6d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff6e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff6f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff700:  feefeffe feefeffe feefeffe feefeffe  
+3ffff710:  feefeffe feefeffe feefeffe feefeffe  
+3ffff720:  feefeffe feefeffe feefeffe feefeffe  
+3ffff730:  feefeffe feefeffe feefeffe feefeffe  
+3ffff740:  feefeffe feefeffe feefeffe feefeffe  
+3ffff750:  feefeffe feefeffe feefeffe feefeffe  
+3ffff760:  feefeffe feefeffe feefeffe feefeffe  
+3ffff770:  feefeffe feefeffe feefeffe feefeffe  
+3ffff780:  feefeffe feefeffe feefeffe feefeffe  
+3ffff790:  feefeffe feefeffe feefeffe feefeffe  
+3ffff7a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff7b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff7c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff7d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff7e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff7f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff800:  feefeffe feefeffe feefeffe feefeffe  
+3ffff810:  feefeffe feefeffe feefeffe feefeffe  
+3ffff820:  feefeffe feefeffe feefeffe feefeffe  
+3ffff830:  feefeffe feefeffe feefeffe feefeffe  
+3ffff840:  feefeffe feefeffe feefeffe feefeffe  
+3ffff850:  feefeffe feefeffe feefeffe feefeffe  
+3ffff860:  feefeffe feefeffe feefeffe feefeffe  
+3ffff870:  feefeffe feefeffe feefeffe feefeffe  
+3ffff880:  feefeffe feefeffe feefeffe feefeffe  
+3ffff890:  feefeffe feefeffe feefeffe feefeffe  
+3ffff8a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff8b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff8c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff8d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff8e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff8f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff900:  feefeffe feefeffe feefeffe feefeffe  
+3ffff910:  feefeffe feefeffe feefeffe feefeffe  
+3ffff920:  feefeffe feefeffe feefeffe feefeffe  
+3ffff930:  feefeffe feefeffe feefeffe feefeffe  
+3ffff940:  feefeffe feefeffe feefeffe feefeffe  
+3ffff950:  feefeffe feefeffe feefeffe feefeffe  
+3ffff960:  feefeffe feefeffe feefeffe feefeffe  
+3ffff970:  feefeffe feefeffe feefeffe feefeffe  
+3ffff980:  feefeffe feefeffe feefeffe feefeffe  
+3ffff990:  feefeffe feefeffe feefeffe feefeffe  
+3ffff9a0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff9b0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff9c0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff9d0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff9e0:  feefeffe feefeffe feefeffe feefeffe  
+3ffff9f0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa00:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa10:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa20:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa30:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa40:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa50:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa60:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa70:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa80:  feefeffe feefeffe feefeffe feefeffe  
+3ffffa90:  feefeffe feefeffe feefeffe feefeffe  
+3ffffaa0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffab0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffac0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffad0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffae0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffaf0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb00:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb10:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb20:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb30:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb40:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb50:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb60:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb70:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb80:  feefeffe feefeffe feefeffe feefeffe  
+3ffffb90:  feefeffe feefeffe feefeffe feefeffe  
+3ffffba0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffbb0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffbc0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffbd0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffbe0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffbf0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc00:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc10:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc20:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc30:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc40:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc50:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc60:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc70:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc80:  feefeffe feefeffe feefeffe feefeffe  
+3ffffc90:  feefeffe feefeffe feefeffe feefeffe  
+3ffffca0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffcb0:  feefeffe feefeffe feefeffe feefeffe  
+3ffffcc0:  feefeffe feefeffe feefeffe 3ffe8368  
+3ffffcd0:  00000000 00000000 3ffffe40 4020acdc  
+3ffffce0:  3ffe88da 3ffffdd3 00000000 feefeffe  
+3ffffcf0:  feefeffe feefeffe 40231703 00000001  
+3ffffd00:  ffffffff 00000000 3ffe9121 00000008  
+3ffffd10:  40231752 3ffef4fc 3ffef4fc 00000000  
+3ffffd20:  00000000 00000000 00000020 4010015c  
+3ffffd30:  000000c0 3ffef4fc 00000000 401020c0  
+3ffffd40:  3ffe8fd0 40230813 3ffef4fc 3ffed270  
+3ffffd50:  00000000 4021a87f 3ffed270 3ffef4fc  
+3ffffd60:  3ffe89af 3ffe8804 00000001 00000000  
+3ffffd70:  3ffef59d 3ffef0cc 0000000f 3ffed9b4  
+3ffffd80:  3ffe89af 3ffe89af 3ffef3a7 4021c6bb  
+3ffffd90:  3ffed968 4021c28c 4021e8fc 3ffed968  
+3ffffda0:  40105d35 000acd3b 3ffeda98 00000000  
+3ffffdb0:  3ffee1a0 3ffeda98 3ffef374 40233a28  
+3ffffdc0:  00000005 00000000 00000020 4010015c  
+3ffffdd0:  3ffeda98 4021e8fc 00000005 401020c0  
+3ffffde0:  3ffe8fd5 40105357 3ffeca60 00000012  
+3ffffdf0:  40102c4b 3ffeca60 3ffed2f4 00000012  
+3ffffe00:  ffffffed 05a8bbd9 3ffed330 40102e28  
+3ffffe10:  3ffe9850 00000000 00000000 4021e8fc  
+3ffffe20:  ffffffed 05a8bbd9 401032e2 00000100  
+3ffffe30:  3ffe9850 7fffffff 00000000 00000001  
+3ffffe40:  00000001 00000080 00000000 00000001  
+3ffffe50:  3ffe9850 3ffee609 00000000 05a8bbd9  
+3ffffe60:  3ffe985c 2c9f0300 4000050c 3fffc278  
+3ffffe70:  40103004 3fffc200 00000022 402016cb  
+3ffffe80:  402014cd 00000030 0000001e ffffffff  
+3ffffe90:  402014c8 00000001 4023a9f0 00000007  
+3ffffea0:  3ffe8850 0000007e 00000000 fffffffe  
+3ffffeb0:  40100fb4 402017dc 00000000 3ffee63c  
+3ffffec0:  3ffee608 00000007 00000001 00000030  
+3ffffed0:  00000000 00000000 00000000 00000000  
+3ffffee0:  ffffff00 3fffffff 00000064 40202225  
+3ffffef0:  2d465554 34355841 442d3030 00303135  
+3fffff00:  40105d35 02c3e11d 3ffee6a4 00000000  
+3fffff10:  3ffee1a0 3ffee6a4 3ffe85e0 3ffee6a4  
+3fffff20:  00024212 000001f4 402020cc 3fffefb0  
+3fffff30:  3ffee6a4 00024212 000001f4 40202225  
+3fffff40:  00024212 000001f4 00024212 4020229e  
+3fffff50:  00000000 00024212 63d70a3d 029c6543  
+3fffff60:  40237c4b fffffffc 3ffee63c 00000001  
+3fffff70:  0000001f 00024212 000001f4 40202878  
+3fffff80:  00000020 3ffee608 3ffee63c 402010c8  
+3fffff90:  feefeffe feefeffe feefeffe feefeffe  
+3fffffa0:  feefeffe feefeffe feefeffe 3ffee6cc  
+<<<stack<<<
+
+--------------- CUT HERE FOR EXCEPTION DECODER ---------------
+
+ ets Jan  8 2013,rst cause:4, boot mode:(3,6)
+
+wdt reset
+load 0x4010f000, len 3424, room 16 
+tail 0
+chksum 0x2e
+load 0x3fff20b8, len 40, room 8 
+tail 0
+chksum 0x2b
+csum 0x2b
+v00042d10
+~ld
+����g�;��o<�d�$`c��|{�d�g��g�□l`��r�d�l��
+
+--- ESP8266 WiFi Test Start ---
+Connecting to SSID: TUF-AX5400-D510
+.............................................................
+[Error] 연결 실패! SSID와 비밀번호를 다시 확인해주세요.
+.............................................................
+[Error] 연결 실패! SSID와 비밀번호를 다시 확인해주세요.
+.......................................................
+ ets Jan  8 2013,rst cause:4, boot mode:(3,6)
+
+wdt reset
+load 0x4010f000, len 3424, room 16 
+tail 0
+chksum 0x2e
+load 0x3fff20b8, len 40, room 8 
+tail 0
+chksum 0x2b
+csum 0x2b
+v00042d10
+~ld
+o{'|ll`b|{dgo□d`{ld
+
+--- ESP8266 WiFi Test Start ---
+Connecting to SSID: TUF-AX5400-D510
+........................................

@@ -1,0 +1,25 @@
+Disconnected! Last state: -3
+MQTT Connecting (FreeHeap:26672)...Success.
+
+Disconnected! Last state: -3
+MQTT Connecting (FreeHeap:26672)...Success.
+
+Disconnected! Last state: -3
+MQTT Connecting (FreeHeap:26672)...Success.
+
+Disconnected! Last state: -3
+MQTT Connecting (FreeHeap:28480)...Success.
+[Status] UNKNOWN | N:0.0 B:0.0
+[Status] UNKNOWN | N:0.0 B:0.0
+[Status] UNKNOWN | N:0.0 B:0.0
+[Status] UNKNOWN | N:0.0 B:0.0
+[Status] UNKNOWN | N:0.0 B:0.0
+
+Disconnected! Last state: -3
+MQTT Connecting (FreeHeap:26880)...Success.
+
+Disconnected! Last state: -3
+MQTT Connecting (FreeHeap:26672)...Success.
+
+Disconnected! Last state: -3
+MQTT Connecting (FreeHeap:26672)...Success.
