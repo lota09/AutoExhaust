@@ -18,23 +18,23 @@ void setup() {
   Serial.begin(115200);
   Peripherals::setup();
   Networking::setup();
-  Networking::sysLog("=== System Booting ===");
-  Networking::sysLog("Connecting to WiFi...");
+  Networking::sysLog("=== System Booting ===\n");
+  Networking::sysLog("Connecting to WiFi"); // No \n, starts inline
 
   while (!Networking::isConnected()) {
     handleWiFi();
     delay(10);
   }
-  Networking::sysLog("WiFi Connected!");
+  Networking::sysLog(" WiFi Connected!\n"); // Ends inline
   Networking::beginServices();
 
   setCpuFrequencyMhz(DEFAULT_CPU_FREQ);
-  String freqMsg = "CPU Frequency: " + String(getCpuFrequencyMhz()) + " MHz";
+  String freqMsg = "CPU Frequency: " + String(getCpuFrequencyMhz()) + " MHz\n";
   Networking::sysLog(freqMsg);
 
-  // Enable Automatic Modem Sleep for ESP32-C3
-  WiFi.setSleep(true);
-  esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
+  // Disable internal modem sleep to prevent conflict with manual light sleep
+  WiFi.setSleep(false);
+  esp_wifi_set_ps(WIFI_PS_NONE);
 
   currentState = STATE_IDLE;
   stateTimer = millis();
@@ -55,7 +55,7 @@ void loop() {
   // 3. Main State Machine
   switch (currentState) {
   case STATE_RESET:
-    Networking::sysLog("System Rebooting...");
+    Networking::sysLog("System Rebooting...\n");
     delay(500);
     ESP.restart(); // Software Reset
     break;
@@ -94,7 +94,7 @@ void loop() {
     break;
 
   case STATE_SLEEP: {
-    Networking::sysLog("=== System Sleep ===");
+    Networking::sysLog("=== System Sleep ===\n");
     Serial.flush();
 
     Peripherals::setFanSpeed(0);
@@ -121,7 +121,7 @@ void loop() {
     while (!Serial && (millis() - waitSerial < 2000))
       ;
 
-    Networking::sysLog("=== System Wakeup ===");
+    Networking::sysLog("=== System Wakeup ===\n");
 
     currentState = STATE_IDLE;
     stateTimer = millis();
@@ -133,7 +133,7 @@ void loop() {
     Peripherals::setLightBrightness(0);
 
     if (Networking::isConnected()) {
-      Networking::sysLog("WiFi Restored. Returning to IDLE.");
+      Networking::sysLog("WiFi Restored. Returning to IDLE.\n");
       currentState = STATE_IDLE;
       stateTimer = millis();
     }
@@ -167,19 +167,20 @@ void handleThermal() {
     lastThermalCheck = millis();
     float temp = temperatureRead();
     if (temp > THERMAL_LIMIT_CRITICAL) {
-      Networking::sysLog("!!! CRITICAL TEMP !!!");
+      Networking::sysLog("!!! CRITICAL TEMP !!!\n");
       delay(10000);
       currentState = STATE_RESET;
     } else if (temp > THERMAL_LIMIT_WARM) {
-      char tBuf[32];
-      sprintf(tBuf, "Warning: CPU Temp High: %.1f", temp);
-      Networking::sysLog(tBuf);
+      Networking::sysLog("Warning: CPU Temp High: %.1f\n", temp);
     }
   }
 }
 
 void handleWiFi() {
+  static uint32_t wifiLostTimer = 0;
+
   if (Networking::isConnected()) {
+    wifiLostTimer = 0; // Reset timer when connected
     return;
   }
 
@@ -187,20 +188,21 @@ void handleWiFi() {
   static uint32_t lastVisualUpdate = 0;
   if (millis() - lastVisualUpdate > 500) {
     lastVisualUpdate = millis();
-    Serial.print(".");
+    Networking::sysLog(".", false);
     Peripherals::update_stateLED(STATE_SETUP);
     Peripherals::update_rgbLED(STATE_SETUP, isRGBOverride);
   }
 
   // State Transition Logic (Only during runtime, not initial setup)
   if (currentState != STATE_WIFI_LOST && currentState != STATE_RESET) {
-    static uint32_t wifiLostTimer = 0;
     if (wifiLostTimer == 0) {
+      Networking::sysLog("WiFi Connection Lost! Reconnecting"); // Start inline
       wifiLostTimer = millis();
-    } else if (millis() - wifiLostTimer > 5000) {
-      Networking::sysLog("WiFi Connection Lost! Entering recovery mode...");
+    } else if (millis() - wifiLostTimer > 10000) {       // Increased to 10s
+      Networking::sysLog(" Entering WiFi Lost State\n"); // End inline
       currentState = STATE_WIFI_LOST;
       wifiLostTimer = 0;
     }
   }
 }
+```

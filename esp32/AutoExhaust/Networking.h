@@ -23,7 +23,7 @@ struct PrinterStatus {
 void setup();
 void beginServices();
 void update();
-void sysLog(String msg);
+void sysLog(const char *format, ...);
 
 // Connectivity
 bool isConnected();

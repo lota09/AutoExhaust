@@ -16,26 +16,46 @@ static String systemLogs[MAX_LOG_ENTRIES];
 static int logIndex = 0;
 static char msgBuffer[128]; // Shared buffer for string formatting
 
-void sysLog(String msg) {
-  time_t now = time(nullptr);
-  struct tm timeinfo;
-  gmtime_r(&now, &timeinfo); // We'll use local time after configTime is set
+static bool isPartialLine = false;
 
-  char timeBuf[20];
-  if (now > 100000) { // If NTP is synced
-    struct tm *lt = localtime(&now);
-    sprintf(timeBuf, "[%02d:%02d:%02d] ", lt->tm_hour, lt->tm_min, lt->tm_sec);
-  } else {
-    // Fallback to uptime if NTP not yet synced
-    uint32_t t = millis() / 1000;
-    sprintf(timeBuf, "[UP:%02d:%02d:%02d] ", (int)(t / 3600) % 24,
-            (int)(t / 60) % 60, (int)t % 60);
+void sysLog(const char *format, ...) {
+  char buffer[256];
+  va_list args;
+  va_start(args, format);
+  vsnprintf(buffer, sizeof(buffer), format, args);
+  va_end(args);
+
+  if (!isPartialLine) {
+    time_t now = time(nullptr);
+    char timeBuf[20];
+    if (now > 100000) { // If NTP is synced
+      struct tm *lt = localtime(&now);
+      sprintf(timeBuf, "[%02d:%02d:%02d] ", lt->tm_hour, lt->tm_min,
+              lt->tm_sec);
+    } else {
+      uint32_t t = millis() / 1000;
+      sprintf(timeBuf, "[UP:%02d:%02d:%02d] ", (int)(t / 3600) % 24,
+              (int)(t / 60) % 60, (int)t % 60);
+    }
+    Serial.print(timeBuf);
+    systemLogs[logIndex] = String(timeBuf);
+    isPartialLine = true;
   }
 
-  String timestampedMsg = String(timeBuf) + msg;
-  Serial.println(timestampedMsg);
-  systemLogs[logIndex] = timestampedMsg;
-  logIndex = (logIndex + 1) % MAX_LOG_ENTRIES;
+  Serial.print(buffer);
+
+  // Clean string for web logs (remove internal newlines for UI consistency)
+  String msg = String(buffer);
+  bool endsWithNewline = msg.endsWith("\n");
+  if (endsWithNewline) {
+    msg.remove(msg.length() - 1);
+  }
+  systemLogs[logIndex] += msg;
+
+  if (endsWithNewline) {
+    logIndex = (logIndex + 1) % MAX_LOG_ENTRIES;
+    isPartialLine = false;
+  }
 }
 
 void handleRoot() {
