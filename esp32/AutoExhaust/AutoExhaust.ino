@@ -184,15 +184,6 @@ void handleWiFi() {
     return;
   }
 
-  // Common Progress Visuals (Dots + LEDs)
-  static uint32_t lastVisualUpdate = 0;
-  if (millis() - lastVisualUpdate > 500) {
-    lastVisualUpdate = millis();
-    Networking::sysLog(".", false);
-    Peripherals::update_stateLED(STATE_SETUP);
-    Peripherals::update_rgbLED(STATE_SETUP, isRGBOverride);
-  }
-
   // State Transition Logic (Only during runtime, not initial setup)
   if (currentState != STATE_WIFI_LOST && currentState != STATE_RESET) {
     if (wifiLostTimer == 0) {
@@ -204,5 +195,13 @@ void handleWiFi() {
       wifiLostTimer = 0;
     }
   }
+
+  // Common Progress Visuals (Dots + LEDs)
+  static uint32_t lastVisualUpdate = 0;
+  if (millis() - lastVisualUpdate > 500) {
+    lastVisualUpdate = millis();
+    Networking::sysLog(".", false);
+    Peripherals::update_stateLED(STATE_SETUP);
+    Peripherals::update_rgbLED(STATE_SETUP, isRGBOverride);
+  }
 }
-```
