@@ -38,13 +38,13 @@ const uint32_t RGB_OVERRIDE_DURATION = 5000; // 5 seconds
 const float THERMAL_LIMIT_WARM = 65.0;       // Warning: Slow down or Notify
 const float THERMAL_LIMIT_CRITICAL = 80.0;   // Danger: Shutdown everything
 
+// --- Built-in LED Modes ---
+const int BLED_OFF = 0;
+const int BLED_BLINK = 1;
+const int BLED_ON = 2;
+
 // --- Networking Specs ---
 const int WEB_SERVER_PORT = 80;
 const char *const SYSTEM_HOSTNAME = "autoexhaust"; // Will be autoexhaust.local
-
-// --- Built-in LED Modes (Macros) ---
-#define BLED_OFF 0
-#define BLED_BLINK 1
-#define BLED_ON 2
 
 #endif

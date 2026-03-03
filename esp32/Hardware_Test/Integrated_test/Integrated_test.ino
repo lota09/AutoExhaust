@@ -1,14 +1,21 @@
+#include "../../AutoExhaust/secrets.h"
+#include <ArduinoJson.h>
 #include <ArduinoOTA.h>
+#include <PubSubClient.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
+
 
 /**
- * AutoExhaust 2.0 Skeleton Code (ESP32-C3 SuperMini)
+ * AutoExhaust 2.0 Integration Test (ESP32-C3 SuperMini)
  *
  * Features:
  * - OTA (Over-The-Air) Update
- * - RGB LED Rainbow Cycling (GPIO 0, 1, 10)
- * - MOSFET PWM control (GPIO 4, 5) with Manual/Auto modes
- * - Voltage Monitoring (GPIO 3) via Voltage Divider (100k/20k)
+ * - WiFi RSSI Measurement
+ * - MQTT Printer Status Monitoring (Bambu Lab)
+ * - RGB LED Rainbow Cycling
+ * - MOSFET PWM control (Fan/Light)
+ * - Voltage Monitoring
  */
 
 // --- Pin Definitions ---
@@ -23,9 +30,9 @@ const int PIN_PROBE = 3; // ADC Power Probe
 const int PWM_FREQ = 5000;
 const int PWM_RES = 8; // 0-255
 
-// --- WiFi Credentials ---
-const char *ssid = "TUF-AX5400-D510";
-const char *password = "YOUR_WIFI_PASSWORD";
+// --- MQTT Settings ---
+const char *MQTT_SERVER = "192.168.50.209";
+const int MQTT_PORT = 8883;
 
 // --- Global Variables ---
 enum ControlMode { MODE_MANUAL_FAN, MODE_MANUAL_LIGHT, MODE_AUTO };
@@ -35,6 +42,16 @@ int manualFanVal = 0;
 int manualLightVal = 0;
 unsigned long prevMillis = 0;
 float hue = 0;
+
+// MQTT Objects
+WiFiClientSecure espClient;
+PubSubClient mqttClient(espClient);
+StaticJsonDocument<200> filter;
+
+// Printer Status Variables
+String printerState = "UNKNOWN";
+float nozzleTemp = 0.0;
+float bedTemp = 0.0;
 
 void setup() {
   Serial.begin(115200);
@@ -47,25 +64,45 @@ void setup() {
   ledcAttach(PIN_FAN, PWM_FREQ, PWM_RES);
   ledcAttach(PIN_LIGHT, PWM_FREQ, PWM_RES);
 
-  // WiFi & OTA
+  // WiFi Setup
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(SECRET_SSID, SECRET_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println("\nWiFi Connected.");
 
-  ArduinoOTA.setHostname("AutoExhaust-C3");
+  // OTA Setup
+  ArduinoOTA.setHostname("AutoExhaust-C3-Test");
   ArduinoOTA.begin();
 
-  Serial.println("OTA Ready.");
+  // MQTT Setup
+  espClient.setInsecure(); // For local Bambu Lab certs
+  mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
+  mqttClient.setCallback(mqttCallback);
+  // Increase buffer size for large Bambu messages
+  if (!mqttClient.setBufferSize(20480)) {
+    Serial.println("MQTT Buffer Allocation Failed!");
+  }
+
+  // JSON Filter Setup
+  filter["print"]["gcode_state"] = true;
+  filter["print"]["nozzle_temper"] = true;
+  filter["print"]["bed_temper"] = true;
+
+  Serial.println("System Ready.");
   Serial.println("Commands: 1 [val](0-255), 2 [val](0-255), 3 (Auto Mode)");
 }
 
 void loop() {
   ArduinoOTA.handle();
   handleSerial();
+
+  if (!mqttClient.connected() && WiFi.status() == WL_CONNECTED) {
+    reconnectMQTT();
+  }
+  mqttClient.loop();
 
   unsigned long currentMillis = millis();
   if (currentMillis - prevMillis >= 20) {
@@ -158,13 +195,56 @@ void updateOutput() {
 
 void reportStatus() {
   static int count = 0;
-  if (count++ % 50 == 0) { // Every 1 second (20ms * 50)
+  if (count++ % 50 == 0) { // Every 1 second
     int rawADC = analogRead(PIN_PROBE);
-    // ADC 12-bit (0-4095), attenuation 11dB (approx 0-3.1V range)
-    // voltage = raw * (3.1 / 4095) * ((100+20)/20)
     float batteryVoltage = rawADC * (3.1 / 4095.0) * 6.0;
+    int rssi = WiFi.RSSI();
 
-    Serial.printf("Voltage: %.2fV | Mode: %s | ADC: %d\n", batteryVoltage,
-                  (currentMode == MODE_AUTO ? "AUTO" : "MANUAL"), rawADC);
+    Serial.printf(
+        "V: %.2fV | RSSI: %d dBm | State: %s | N:%.1f B:%.1f | Mode: %s\n",
+        batteryVoltage, rssi, printerState.c_str(), nozzleTemp, bedTemp,
+        (currentMode == MODE_AUTO ? "AUTO" : "MANUAL"));
+  }
+}
+
+// --- MQTT Functions ---
+
+void mqttCallback(char *topic, byte *payload, unsigned int length) {
+  // Use a larger local buffer for parsing
+  DynamicJsonDocument doc(20480);
+  DeserializationError error = deserializeJson(
+      doc, payload, length, DeserializationOption::Filter(filter));
+
+  if (error) {
+    return;
+  }
+
+  JsonObject printData = doc["print"];
+  if (printData.containsKey("gcode_state")) {
+    printerState = printData["gcode_state"].as<String>();
+    nozzleTemp = printData["nozzle_temper"] | 0.0;
+    bedTemp = printData["bed_temper"] | 0.0;
+  }
+}
+
+void reconnectMQTT() {
+  static unsigned long lastReconnectAttempt = 0;
+  if (millis() - lastReconnectAttempt < 5000)
+    return;
+  lastReconnectAttempt = millis();
+
+  Serial.print("MQTT connecting...");
+  String clientId = "AutoExhaust-Test-";
+  clientId += String(random(0xffff), HEX);
+
+  if (mqttClient.connect(clientId.c_str(), SECRET_MQTT_USER,
+                         SECRET_MQTT_PASS)) {
+    Serial.println("connected");
+    char topic[64];
+    sprintf(topic, "device/%s/report", SECRET_PRINTER_SN);
+    mqttClient.subscribe(topic);
+  } else {
+    Serial.print("failed, rc=");
+    Serial.println(mqttClient.state());
   }
 }

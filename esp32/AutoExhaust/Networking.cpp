@@ -17,32 +17,65 @@ bool webManualControl = false;
 
 void handleRoot() {
   String html =
-      "<html><head><meta name='viewport' content='width=device-width, "
-      "initial-scale=1'><title>AutoExhaust 2.0</title>";
-  html += "<style>body{font-family:Sans-Serif; background:#121212; "
-          "color:white; text-align:center;} ";
-  html += ".btn{padding:15px; margin:10px; border-radius:10px; border:none; "
-          "color:white; font-size:1.2em; cursor:pointer;} ";
-  html += ".on{background:#2ecc71;} .off{background:#e74c3c;} "
-          "</style></head><body>";
+      "<!DOCTYPE html><html><head>"
+      "<meta charset='UTF-8'>"
+      "<meta name='viewport' content='width=device-width, initial-scale=1'>"
+      "<title>AutoExhaust Dashboard</title>";
+  html +=
+      "<style>"
+      "body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; "
+      "background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); "
+      "color: #e9ecef; text-align: center; margin: 0; padding: 20px; "
+      "min-height: 100vh; }"
+      ".container { max-width: 500px; margin: auto; background: rgba(255, 255, "
+      "255, 0.05); "
+      "padding: 30px; border-radius: 24px; backdrop-filter: blur(10px); "
+      "box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); border: 1px solid "
+      "rgba(255, 255, 255, 0.1); }"
+      "h1 { font-size: 2.2em; margin-bottom: 10px; background: "
+      "linear-gradient(to right, #4facfe 0%, #00f2fe 100%); "
+      "-webkit-background-clip: text; -webkit-text-fill-color: transparent; }"
+      ".status-card { background: rgba(0,0,0,0.2); padding: 15px; "
+      "border-radius: 15px; margin: 20px 0; border-left: 5px solid #4facfe; }"
+      ".btn { display: inline-block; padding: 12px 30px; margin: 10px; "
+      "border-radius: 30px; border: none; "
+      "color: white; font-weight: bold; font-size: 1em; cursor: pointer; "
+      "transition: 0.3s; text-decoration: none; }"
+      ".on { background: linear-gradient(to right, #11998e, #38ef7d); "
+      "box-shadow: 0 4px 15px rgba(17,153,142,0.4); }"
+      ".off { background: linear-gradient(to right, #cb2d3e, #ef473a); "
+      "box-shadow: 0 4px 15px rgba(203,45,62,0.4); }"
+      ".btn:hover { transform: translateY(-2px); opacity: 0.9; }"
+      "input[type=range] { width: 80%; margin: 15px 0; }"
+      "</style></head><body>";
+  html += "<div class='container'>";
   html += "<h1>🌀 AutoExhaust 2.0</h1>";
-  html += "<p>Printer Status: <b>" + lastStatus.state + "</b></p>";
-  html += "<p>Nozzle: " + String(lastStatus.nozzleTemp) +
-          "C | Bed: " + String(lastStatus.bedTemp) + "C</p>";
-  html += "<hr>";
-  html += "<h3>Control</h3>";
-  html += "<p>Mode: " + String(webManualControl ? "MANUAL" : "AUTO") + "</p>";
+  html += "<div class='status-card'>";
+  html += "<p>Printer Status: <b style='color:#00f2fe;'>" + lastStatus.state +
+          "</b></p>";
+  html += "<p>🌡️ Nozzle: " + String(lastStatus.nozzleTemp, 1) +
+          "°C | Bed: " + String(lastStatus.bedTemp, 1) + "°C</p>";
+  html += "</div>";
+  html +=
+      "<hr style='border: 0; border-top: 1px solid rgba(255,255,255,0.1);'>";
+  html += "<h3>⚙️ System Control</h3>";
+  html += "<p>Mode: <span style='color:" +
+          String(webManualControl ? "#e74c3c" : "#2ecc71") + "'>" +
+          (webManualControl ? "MANUAL" : "AUTO") + "</span></p>";
   html += "<a href='/toggle'><button class='btn " +
           String(webManualControl ? "off" : "on") + "'>" +
-          String(webManualControl ? "Switch to AUTO" : "Switch to MANUAL") +
+          (webManualControl ? "Switch to AUTO" : "Switch to MANUAL") +
           "</button></a>";
-  html += "<br><form action='/set'><input type='range' name='fan' min='0' "
+  html += "<form action='/set' style='margin-top:20px;'>";
+  html +=
+      "<p>Fan Speed: <input type='range' name='fan' min='0' max='255' value='" +
+      String(webFanSpeed) + "'></p>";
+  html += "<p>LED Brightness: <input type='range' name='strip' min='0' "
           "max='255' value='" +
-          String(webFanSpeed) + "'> Fan<br>";
-  html += "<input type='range' name='strip' min='0' max='255' value='" +
-          String(webStripBrightness) + "'> Strip<br>";
-  html += "<input type='submit' value='Apply'></form>";
-  html += "</body></html>";
+          String(webStripBrightness) + "'></p>";
+  html += "<input type='submit' value='Apply Changes' class='btn' "
+          "style='background:#555;'>";
+  html += "</form></div></body></html>";
   server.send(200, "text/html", html);
 }
 
@@ -85,13 +118,15 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
       lastStatus.isPrinting = false;
     }
   }
-} // <--- Missing brace was here!
+}
 
 void setup() {
   filter["print"]["gcode_state"] = true;
   filter["print"]["nozzle_temper"] = true;
   filter["print"]["bed_temper"] = true;
 
+  Serial.println("WiFi Initializing...");
+  WiFi.setAutoReconnect(true); // Ensure hardware auto-reconnect
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
   secureClient
@@ -109,7 +144,7 @@ void setup() {
   server.on("/set", handleSet);
   server.begin(WEB_SERVER_PORT);
 
-  // mDNS Setup (Add this)
+  // mDNS Setup
   if (MDNS.begin(SYSTEM_HOSTNAME)) {
     Serial.print("mDNS responder started: http://");
     Serial.print(SYSTEM_HOSTNAME);
@@ -126,6 +161,13 @@ void reconnect() {
   if (!mqttClient.connected() && WiFi.status() == WL_CONNECTED) {
     String clientId = "AutoExhaust-C3-";
     clientId += String(random(0xffff), HEX);
+
+    Serial.print("Attempting MQTT connection to: ");
+    Serial.println(MQTT_SERVER);
+
+    // Give some time for background tasks
+    yield();
+
     if (mqttClient.connect(clientId.c_str(), MQTT_USER, MQTT_PASS)) {
       Serial.println("MQTT Connected!");
       char topic[64];
@@ -135,7 +177,9 @@ void reconnect() {
       Serial.println(topic);
     } else {
       Serial.print("MQTT Connect Failed, rc=");
-      Serial.println(mqttClient.state());
+      Serial.print(mqttClient.state());
+      Serial.print(" | WiFi RSSI: ");
+      Serial.println(WiFi.RSSI());
     }
   }
 }
@@ -149,8 +193,6 @@ void update() {
     ArduinoOTA.handle();
   }
 }
-
-void handleOTA() { ArduinoOTA.handle(); }
 
 bool isConnected() { return WiFi.status() == WL_CONNECTED; }
 

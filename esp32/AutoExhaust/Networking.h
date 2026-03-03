@@ -17,7 +17,6 @@ struct PrinterStatus {
 
 void setup();
 void update();
-void handleOTA();
 
 // Connectivity
 bool isConnected();

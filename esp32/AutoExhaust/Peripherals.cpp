@@ -3,7 +3,7 @@
 
 namespace Peripherals {
 static float hue = 0;
-static int builtinMode = BLED_OFF;
+static int builtinMode = BLED_BLINK;
 static uint32_t lastBlinkTime = 0;
 void setup() {
   // Built-in LED (Low-Active on C3 SuperMini)
@@ -118,10 +118,7 @@ void update(bool isRunning, bool isOverride) {
   } else if (builtinMode == BLED_ON) {
     digitalWrite(PIN_BUILTIN, LOW);
   } else if (builtinMode == BLED_BLINK) {
-    if (millis() - lastBlinkTime >= 500) {
-      lastBlinkTime = millis();
-      digitalWrite(PIN_BUILTIN, !digitalRead(PIN_BUILTIN));
-    }
+    digitalWrite(PIN_BUILTIN, !digitalRead(PIN_BUILTIN));
   }
 
   // Handle RGB LED

@@ -12,7 +12,6 @@ void setFanSpeed(uint8_t speed);
 void setStripBrightness(uint8_t brightness);
 
 // Built-in LED Visuals
-// Built-in LED Visuals
 void setBuiltinLED(int mode);
 
 // Power & Thermal Monitoring

@@ -1,15 +1,11 @@
+#include "../../AutoExhaust/secrets.h"
 #include <ArduinoOTA.h>
 #include <WiFi.h>
 
-/*
- * ESP32-C3 SuperMini Standard Initial OTA
- *
- * 정적 설정 및 최적화 없이 표준 라이브러리 예제 기반으로 구성되었습니다.
- */
 
 // --- 사용자 설정 ---
-const char *ssid = "TUF-AX5400-D510";
-const char *password = "YOUR_WIFI_PASSWORD";
+const char *ssid = SECRET_SSID;
+const char *password = SECRET_PASS;
 
 const int ledPin = 8; // C3 SuperMini 내장 LED
 

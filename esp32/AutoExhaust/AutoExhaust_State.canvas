@@ -1,0 +1,164 @@
+{
+  "nodes": [
+    {
+      "id": "node_1",
+      "x": -4.702115464504146,
+      "y": 207.97730403539077,
+      "width": 200,
+      "height": 100,
+      "type": "text",
+      "text": "### 🚀 Reset\nPower On / Reboot"
+    },
+    {
+      "id": "node_2",
+      "x": 300,
+      "y": 200,
+      "width": 230,
+      "height": 120,
+      "type": "text",
+      "text": "### 📡 WiFi Connecting\n- LED Blink (1Hz)\n- Searching SSID..."
+    },
+    {
+      "id": "node_3",
+      "x": 700,
+      "y": 200,
+      "width": 250,
+      "height": 120,
+      "type": "text",
+      "text": "### 🏠 IDLE\n- MQTT Connection Check\n- Wait for Print Job"
+    },
+    {
+      "id": "node_9",
+      "x": 1050,
+      "y": 50,
+      "width": 250,
+      "height": 100,
+      "type": "text",
+      "text": "### 🔍 MQTT Check\nDetected: `print_running`"
+    },
+    {
+      "id": "node_4",
+      "x": 1400,
+      "y": 200,
+      "width": 250,
+      "height": 120,
+      "type": "text",
+      "text": "### 🌀 Running\n- Fan & Light Active\n- MQTT Monitor (0.1 Hz)"
+    },
+    {
+      "id": "node_5",
+      "x": 1050,
+      "y": 350,
+      "width": 250,
+      "height": 100,
+      "type": "text",
+      "text": "### ✅ Done\nJob Finished / Error"
+    },
+    {
+      "id": "node_6",
+      "x": 700,
+      "y": 500,
+      "width": 250,
+      "height": 100,
+      "type": "text",
+      "text": "### 😴 Sleep\nDeep Sleep Mode"
+    },
+    {
+      "id": "node_12",
+      "x": 400,
+      "y": 650,
+      "width": 250,
+      "height": 100,
+      "type": "text",
+      "text": "### ⏰ Timer Wakeup\nPeriodic Status Check"
+    },
+    {
+      "id": "node_13",
+      "x": 1000,
+      "y": 650,
+      "width": 250,
+      "height": 100,
+      "type": "text",
+      "text": "### 🔘 Button Wakeup\n- ADC Probe Display\n- Manual Toggle"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "node_1",
+      "fromSide": "right",
+      "toNode": "node_2",
+      "toSide": "left"
+    },
+    {
+      "id": "e2",
+      "fromNode": "node_2",
+      "fromSide": "right",
+      "toNode": "node_3",
+      "toSide": "left"
+    },
+    {
+      "id": "e3",
+      "fromNode": "node_3",
+      "fromSide": "right",
+      "toNode": "node_9",
+      "toSide": "left"
+    },
+    {
+      "id": "e4",
+      "fromNode": "node_9",
+      "fromSide": "right",
+      "toNode": "node_4",
+      "toSide": "left"
+    },
+    {
+      "id": "e5",
+      "fromNode": "node_4",
+      "fromSide": "bottom",
+      "toNode": "node_5",
+      "toSide": "right"
+    },
+    {
+      "id": "e6",
+      "fromNode": "node_5",
+      "fromSide": "left",
+      "toNode": "node_3",
+      "toSide": "bottom"
+    },
+    {
+      "id": "e7",
+      "fromNode": "node_3",
+      "fromSide": "bottom",
+      "toNode": "node_6",
+      "toSide": "top"
+    },
+    {
+      "id": "e8",
+      "fromNode": "node_6",
+      "fromSide": "bottom",
+      "toNode": "node_12",
+      "toSide": "top"
+    },
+    {
+      "id": "e9",
+      "fromNode": "node_6",
+      "fromSide": "bottom",
+      "toNode": "node_13",
+      "toSide": "top"
+    },
+    {
+      "id": "e10",
+      "fromNode": "node_12",
+      "fromSide": "right",
+      "toNode": "node_3",
+      "toSide": "bottom"
+    },
+    {
+      "id": "e11",
+      "fromNode": "node_13",
+      "fromSide": "left",
+      "toNode": "node_3",
+      "toSide": "bottom"
+    }
+  ]
+}
