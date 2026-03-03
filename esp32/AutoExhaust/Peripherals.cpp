@@ -2,9 +2,6 @@
 #include <math.h>
 
 namespace Peripherals {
-static float hue = 0;
-static int builtinMode = BLED_BLINK;
-static uint32_t lastBlinkTime = 0;
 void setup() {
   // Built-in LED (Low-Active on C3 SuperMini)
   pinMode(PIN_BUILTIN, OUTPUT);
@@ -27,22 +24,15 @@ void setStripBrightness(uint8_t brightness) {
   ledcWrite(PIN_STRIP, brightness);
 }
 
-void setBuiltinLED(int mode) { builtinMode = mode; }
-
 float getBatteryVoltage() {
   int raw = analogRead(PIN_PROBE);
-  // Voltage = raw * (3.1 / 4095) * (120/20)
   return raw * (3.1f / 4095.0f) * 6.0f;
 }
 
-float getChipTemperature() {
-  // ESP32-C3 internal temperature sensor (Standard Arduino API)
-  return temperatureRead();
-}
+float getChipTemperature() { return temperatureRead(); }
 
 void showBatteryStatus() {
   float v = getBatteryVoltage();
-  // Simple mapping: > 12.5V Green, 11-12.5V Yellow, < 11V Red
   if (v > 12.5) {
     ledcWrite(PIN_RGB_R, 0);
     ledcWrite(PIN_RGB_G, 255);
@@ -59,9 +49,10 @@ void showBatteryStatus() {
 }
 
 void updateRainbow() {
+  static float hue = 0;
   static uint32_t lastRainbowUpdate = 0;
   if (millis() - lastRainbowUpdate < 20)
-    return; // Only 50 times per second
+    return;
   lastRainbowUpdate = millis();
 
   hue += 0.5;
@@ -111,23 +102,51 @@ void clearRGB() {
   ledcWrite(PIN_RGB_B, 0);
 }
 
-void update(bool isRunning, bool isOverride) {
-  // Handle Built-in LED modes (Low-Active: LOW=ON, HIGH=OFF)
-  if (builtinMode == BLED_OFF) {
-    digitalWrite(PIN_BUILTIN, HIGH);
-  } else if (builtinMode == BLED_ON) {
-    digitalWrite(PIN_BUILTIN, LOW);
-  } else if (builtinMode == BLED_BLINK) {
-    digitalWrite(PIN_BUILTIN, !digitalRead(PIN_BUILTIN));
+void update_stateLED(SystemState state) {
+  static uint32_t lastBlink = 0;
+  static bool ledOn = false;
+
+  switch (state) {
+  case STATE_IDLE:
+  case STATE_RUNNING:
+    digitalWrite(PIN_BUILTIN, LOW); // ON (Low-Active)
+    break;
+
+  case STATE_SETUP:
+  case STATE_WIFI_LOST:
+    if (millis() - lastBlink > 500) {
+      lastBlink = millis();
+      ledOn = !ledOn;
+      digitalWrite(PIN_BUILTIN, ledOn ? LOW : HIGH);
+    }
+    break;
+
+  default:
+    digitalWrite(PIN_BUILTIN, HIGH); // OFF
+    break;
+  }
+}
+
+void update_rgbLED(SystemState state, bool isRGBOverride) {
+  // Manual override takes priority
+  if (isRGBOverride) {
+    showBatteryStatus();
+    return;
   }
 
-  // Handle RGB LED
-  if (isOverride) {
+  switch (state) {
+  case STATE_SETUP:
+  case STATE_WIFI_LOST:
     showBatteryStatus();
-  } else if (isRunning) {
+    break;
+
+  case STATE_RUNNING:
     updateRainbow();
-  } else {
+    break;
+
+  default:
     clearRGB();
+    break;
   }
 }
 } // namespace Peripherals

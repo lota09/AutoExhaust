@@ -3,16 +3,19 @@
 
 #include "Config.h"
 
+// --- Status LED Modes ---
+const int BLED_OFF = 0;
+const int BLED_BLINK = 1;
+const int BLED_ON = 2;
+
 namespace Peripherals {
 void setup();
-void update(bool isRunning, bool isOverride);
+void update_stateLED(SystemState state);
+void update_rgbLED(SystemState state, bool isRGBOverride);
 
 // PWM Controls
 void setFanSpeed(uint8_t speed);
 void setStripBrightness(uint8_t brightness);
-
-// Built-in LED Visuals
-void setBuiltinLED(int mode);
 
 // Power & Thermal Monitoring
 float getBatteryVoltage();

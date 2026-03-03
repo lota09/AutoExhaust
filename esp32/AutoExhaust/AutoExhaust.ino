@@ -4,14 +4,6 @@
 #include <Arduino.h>
 #include <esp_wifi.h>
 
-enum SystemState {
-  STATE_RESET,
-  STATE_IDLE,
-  STATE_RUNNING,
-  STATE_SLEEP,
-  STATE_WIFI_LOST
-};
-
 SystemState currentState = STATE_RESET;
 uint32_t stateTimer = 0;
 uint32_t overrideTimer = 0;
@@ -20,15 +12,19 @@ bool lastButtonState = HIGH;
 
 void handleButton() {
   bool currentButton = digitalRead(PIN_BUTTON);
+
   if (lastButtonState == HIGH && currentButton == LOW) {
     // Button Pressed
     isRGBOverride = true;
     overrideTimer = millis();
     stateTimer = millis();
-  } else if (isRGBOverride &&
-             (millis() - overrideTimer > RGB_OVERRIDE_DURATION)) {
+  }
+
+  else if (isRGBOverride &&
+           (millis() - overrideTimer > RGB_OVERRIDE_DURATION)) {
     isRGBOverride = false;
   }
+
   lastButtonState = currentButton;
 }
 
@@ -37,15 +33,16 @@ void setup() {
   Peripherals::setup();
   Networking::setup();
 
-  // Focus only on WiFi during setup - REMOVED ADC UPDATES to prevent RF
-  // interference
+  // Focus only on WiFi during setup
   Serial.print("Connecting to WiFi...");
   while (!Networking::isConnected()) {
     delay(500);
     Serial.print(".");
-    Peripherals::update(false, isRGBOverride);
+    Peripherals::update_stateLED(STATE_SETUP);
+    Peripherals::update_rgbLED(STATE_SETUP, isRGBOverride);
   }
-  Serial.println("\nWiFi Connected. System Ready.");
+  Serial.println("\nWiFi Connected!");
+  Networking::beginServices(); // Start Web, mDNS, OTA after IP is assigned
 
   setCpuFrequencyMhz(DEFAULT_CPU_FREQ);
   Serial.print("CPU Frequency set to: ");
@@ -65,8 +62,9 @@ void setup() {
 void loop() {
   // 1. Button Handling
   handleButton();
-  // Peripheral Visual Update (Rainbow, Battery, Built-in LED)
-  Peripherals::update(currentState == STATE_RUNNING, isRGBOverride);
+
+  Peripherals::update_stateLED(currentState);
+  Peripherals::update_rgbLED(currentState, isRGBOverride);
 
   // 2. Critical Background Tasks (Always run except in hardware sleep)
   Networking::update();
@@ -112,7 +110,6 @@ void loop() {
     break;
 
   case STATE_IDLE:
-    Peripherals::setBuiltinLED(BLED_ON); // Blip ON to show activity
     Peripherals::setFanSpeed(0);
     Peripherals::setStripBrightness(0);
 
@@ -128,7 +125,6 @@ void loop() {
     break;
 
   case STATE_RUNNING:
-    Peripherals::setBuiltinLED(BLED_ON);
     if (Networking::webManualControl) {
       Peripherals::setFanSpeed(Networking::webFanSpeed);
       Peripherals::setStripBrightness(Networking::webStripBrightness);
@@ -145,23 +141,43 @@ void loop() {
     }
     break;
 
-  case STATE_SLEEP:
-    // Manual light sleep (esp_light_sleep_start) is disabled to maintain WiFi.
-    // In this state, we rely on automatic Modem Sleep configured in setup().
-    Peripherals::setBuiltinLED(BLED_OFF);
+  case STATE_SLEEP: {
+    Serial.println("Entering Light Sleep (Real)...");
+    Serial.flush();
+
     Peripherals::setFanSpeed(0);
     Peripherals::setStripBrightness(0);
 
-    // If printing starts or manual control toggled, wake up to RUNNING
-    if (Networking::getPrinterStatus().isPrinting ||
-        Networking::webManualControl) {
-      Serial.println("Waking up for activity...");
-      currentState = STATE_RUNNING;
-    }
+    // Configure Wakeup Sources
+    esp_sleep_enable_timer_wakeup(MODEM_SLEEP_INTERVAL * 1000);
+    gpio_wakeup_enable((gpio_num_t)PIN_BUTTON, GPIO_INTR_LOW_LEVEL);
+    esp_sleep_enable_gpio_wakeup();
+
+    // Start Light Sleep
+    esp_light_sleep_start();
+
+    // --- Resumes Here ---
+
+    // Robust Serial Re-init for ESP32-C3 USB CDC
+    delay(1000);  // Time for USB hardware to stabilize
+    Serial.end(); // Close original handle
+    delay(100);
+    Serial.begin(115200); // Re-init Serial
+
+    // Robust wait for Serial (max 2 seconds)
+    uint32_t waitSerial = millis();
+    while (!Serial && (millis() - waitSerial < 2000))
+      ;
+
+    Serial.println("\n\n--- [SYSTEM WAKEUP SUCCESS] ---");
+    Serial.println("If this is visible, the USB connection was recovered.");
+
+    currentState = STATE_IDLE;
+    stateTimer = millis();
     break;
+  }
 
   case STATE_WIFI_LOST:
-    Peripherals::setBuiltinLED(BLED_BLINK); // Visual warning
     Peripherals::setFanSpeed(0);
     Peripherals::setStripBrightness(0);
 

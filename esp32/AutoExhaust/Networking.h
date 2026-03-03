@@ -16,6 +16,7 @@ struct PrinterStatus {
 };
 
 void setup();
+void beginServices();
 void update();
 
 // Connectivity

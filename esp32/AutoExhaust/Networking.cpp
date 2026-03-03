@@ -67,10 +67,10 @@ void handleRoot() {
           (webManualControl ? "Switch to AUTO" : "Switch to MANUAL") +
           "</button></a>";
   html += "<form action='/set' style='margin-top:20px;'>";
-  html +=
-      "<p>Fan Speed: <input type='range' name='fan' min='0' max='255' value='" +
-      String(webFanSpeed) + "'></p>";
-  html += "<p>LED Brightness: <input type='range' name='strip' min='0' "
+  html += "<p>Fan Speed\n <input type='range' name='fan' min='0' max='255' "
+          "value='" +
+          String(webFanSpeed) + "'></p>";
+  html += "<p>LED Brightness\n <input type='range' name='strip' min='0' "
           "max='255' value='" +
           String(webStripBrightness) + "'></p>";
   html += "<input type='submit' value='Apply Changes' class='btn' "
@@ -134,10 +134,14 @@ void setup() {
   mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
   mqttClient.setCallback(mqttCallback);
 
-  // Bambu messages can be > 10KB. Default 256B is too small.
   if (!mqttClient.setBufferSize(20480)) {
     Serial.println("MQTT Buffer Allocation Failed!");
   }
+}
+
+void beginServices() {
+  Serial.print("WiFi Connected. Local IP: ");
+  Serial.println(WiFi.localIP());
 
   server.on("/", handleRoot);
   server.on("/toggle", handleToggle);
@@ -149,16 +153,23 @@ void setup() {
     Serial.print("mDNS responder started: http://");
     Serial.print(SYSTEM_HOSTNAME);
     Serial.println(".local");
+    MDNS.addService("http", "tcp", 80);
   }
 
   // OTA Setup
   ArduinoOTA.setHostname("AutoExhaust-C3");
   ArduinoOTA.setPassword(OTA_PASS);
   ArduinoOTA.begin();
+  Serial.println("Network Services (Web, mDNS, OTA) Started.");
 }
 
 void reconnect() {
+  static uint32_t lastReconnectAttempt = 0;
+  if (millis() - lastReconnectAttempt < 5000)
+    return; // Wait at least 5 seconds between attempts
+
   if (!mqttClient.connected() && WiFi.status() == WL_CONNECTED) {
+    lastReconnectAttempt = millis();
     String clientId = "AutoExhaust-C3-";
     clientId += String(random(0xffff), HEX);
 
