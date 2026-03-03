@@ -21,7 +21,7 @@ const int PIN_RGB_R = 0;
 const int PIN_RGB_G = 1;
 const int PIN_RGB_B = 10;
 const int PIN_FAN = 4;     // MOSFET 1
-const int PIN_STRIP = 5;   // MOSFET 2
+const int PIN_LIGHT = 5;   // MOSFET 2
 const int PIN_PROBE = 3;   // ADC Node A
 const int PIN_BUILTIN = 8; // Internal LED
 const int PIN_BUTTON = 9;  // Tact Button (Default Boot button)
@@ -34,9 +34,11 @@ const int PWM_RES = 8; // 0-255
 const int DEFAULT_CPU_FREQ =
     80; // MHz (80 recommended for WiFi/Thermal balance)
 const uint32_t MODEM_SLEEP_INTERVAL = 10000; // 10 seconds
+const uint32_t STATUS_LOG_INTERVAL = 1000;   // Log status every 1s (debug)
 const uint32_t RGB_OVERRIDE_DURATION = 5000; // 5 seconds
 const float THERMAL_LIMIT_WARM = 65.0;       // Warning: Slow down or Notify
 const float THERMAL_LIMIT_CRITICAL = 80.0;   // Danger: Shutdown everything
+const int MAX_LOG_ENTRIES = 50;              // Max logs displayed in web UI
 
 // --- System States ---
 enum SystemState {

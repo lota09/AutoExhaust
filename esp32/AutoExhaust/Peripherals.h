@@ -15,12 +15,13 @@ void update_rgbLED(SystemState state, bool isRGBOverride);
 
 // PWM Controls
 void setFanSpeed(uint8_t speed);
-void setStripBrightness(uint8_t brightness);
+void setLightBrightness(uint8_t brightness);
+uint8_t getFanSpeed();
+uint8_t getLightBrightness();
 
 // Power & Thermal Monitoring
-float getBatteryVoltage();
-float getChipTemperature();
-void showBatteryStatus(); // Set RGB color based on voltage
+float getPowerVoltage();
+void showPowerStatus(); // Set RGB color based on voltage
 
 // RGB Effects
 void updateRainbow();

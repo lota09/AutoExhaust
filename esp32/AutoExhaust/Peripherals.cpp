@@ -2,6 +2,9 @@
 #include <math.h>
 
 namespace Peripherals {
+static uint8_t fanSpeed = 0;
+static uint8_t lightBrightness = 0;
+
 void setup() {
   // Built-in LED (Low-Active on C3 SuperMini)
   pinMode(PIN_BUILTIN, OUTPUT);
@@ -12,27 +15,32 @@ void setup() {
   ledcAttach(PIN_RGB_G, PWM_FREQ, PWM_RES);
   ledcAttach(PIN_RGB_B, PWM_FREQ, PWM_RES);
   ledcAttach(PIN_FAN, PWM_FREQ, PWM_RES);
-  ledcAttach(PIN_STRIP, PWM_FREQ, PWM_RES);
+  ledcAttach(PIN_LIGHT, PWM_FREQ, PWM_RES);
 
   // Button
   pinMode(PIN_BUTTON, INPUT_PULLUP);
 }
 
-void setFanSpeed(uint8_t speed) { ledcWrite(PIN_FAN, speed); }
-
-void setStripBrightness(uint8_t brightness) {
-  ledcWrite(PIN_STRIP, brightness);
+void setFanSpeed(uint8_t speed) {
+  fanSpeed = speed;
+  ledcWrite(PIN_FAN, speed);
 }
 
-float getBatteryVoltage() {
+void setLightBrightness(uint8_t brightness) {
+  lightBrightness = brightness;
+  ledcWrite(PIN_LIGHT, brightness);
+}
+
+uint8_t getFanSpeed() { return fanSpeed; }
+uint8_t getLightBrightness() { return lightBrightness; }
+
+float getPowerVoltage() {
   int raw = analogRead(PIN_PROBE);
   return raw * (3.1f / 4095.0f) * 6.0f;
 }
 
-float getChipTemperature() { return temperatureRead(); }
-
-void showBatteryStatus() {
-  float v = getBatteryVoltage();
+void showPowerStatus() {
+  float v = getPowerVoltage();
   if (v > 12.5) {
     ledcWrite(PIN_RGB_R, 0);
     ledcWrite(PIN_RGB_G, 255);
@@ -130,14 +138,14 @@ void update_stateLED(SystemState state) {
 void update_rgbLED(SystemState state, bool isRGBOverride) {
   // Manual override takes priority
   if (isRGBOverride) {
-    showBatteryStatus();
+    showPowerStatus();
     return;
   }
 
   switch (state) {
   case STATE_SETUP:
   case STATE_WIFI_LOST:
-    showBatteryStatus();
+    showPowerStatus();
     break;
 
   case STATE_RUNNING:

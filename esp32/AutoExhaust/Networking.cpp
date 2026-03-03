@@ -1,7 +1,5 @@
 #include "Networking.h"
-#include <ArduinoOTA.h>
-#include <ESPmDNS.h>
-#include <WiFiClientSecure.h>
+#include "Peripherals.h"
 
 namespace Networking {
 static WiFiClientSecure secureClient;
@@ -12,8 +10,33 @@ static PrinterStatus lastStatus = {"UNKNOWN", 0.0, 0.0, false};
 static StaticJsonDocument<200> filter;
 
 int webFanSpeed = 255;
-int webStripBrightness = 200;
+int webLightBrightness = 200;
 bool webManualControl = false;
+static String systemLogs[MAX_LOG_ENTRIES];
+static int logIndex = 0;
+static char msgBuffer[128]; // Shared buffer for string formatting
+
+void sysLog(String msg) {
+  time_t now = time(nullptr);
+  struct tm timeinfo;
+  gmtime_r(&now, &timeinfo); // We'll use local time after configTime is set
+
+  char timeBuf[20];
+  if (now > 100000) { // If NTP is synced
+    struct tm *lt = localtime(&now);
+    sprintf(timeBuf, "[%02d:%02d:%02d] ", lt->tm_hour, lt->tm_min, lt->tm_sec);
+  } else {
+    // Fallback to uptime if NTP not yet synced
+    uint32_t t = millis() / 1000;
+    sprintf(timeBuf, "[UP:%02d:%02d:%02d] ", (int)(t / 3600) % 24,
+            (int)(t / 60) % 60, (int)t % 60);
+  }
+
+  String timestampedMsg = String(timeBuf) + msg;
+  Serial.println(timestampedMsg);
+  systemLogs[logIndex] = timestampedMsg;
+  logIndex = (logIndex + 1) % MAX_LOG_ENTRIES;
+}
 
 void handleRoot() {
   String html =
@@ -47,6 +70,11 @@ void handleRoot() {
       "box-shadow: 0 4px 15px rgba(203,45,62,0.4); }"
       ".btn:hover { transform: translateY(-2px); opacity: 0.9; }"
       "input[type=range] { width: 80%; margin: 15px 0; }"
+      ".log-container { background: rgba(0,0,0,0.5); padding: 10px; "
+      "border-radius: 10px; margin-top: 20px; text-align: left; "
+      "font-family: monospace; font-size: 0.85em; color: #00f2fe; "
+      "max-height: 150px; overflow-y: auto; border: 1px solid "
+      "rgba(255,255,255,0.1); }"
       "</style></head><body>";
   html += "<div class='container'>";
   html += "<h1>🌀 AutoExhaust 2.0</h1>";
@@ -55,6 +83,8 @@ void handleRoot() {
           "</b></p>";
   html += "<p>🌡️ Nozzle: " + String(lastStatus.nozzleTemp, 1) +
           "°C | Bed: " + String(lastStatus.bedTemp, 1) + "°C</p>";
+  html += "<p>💻 ESP32 Temp: <span style='color:#f1c40f;'>" +
+          String(temperatureRead(), 1) + "°C</span></p>";
   html += "</div>";
   html +=
       "<hr style='border: 0; border-top: 1px solid rgba(255,255,255,0.1);'>";
@@ -70,12 +100,21 @@ void handleRoot() {
   html += "<p>Fan Speed\n <input type='range' name='fan' min='0' max='255' "
           "value='" +
           String(webFanSpeed) + "'></p>";
-  html += "<p>LED Brightness\n <input type='range' name='strip' min='0' "
+  html += "<p>Light Brightness\n <input type='range' name='light' min='0' "
           "max='255' value='" +
-          String(webStripBrightness) + "'></p>";
+          String(webLightBrightness) + "'></p>";
   html += "<input type='submit' value='Apply Changes' class='btn' "
           "style='background:#555;'>";
-  html += "</form></div></body></html>";
+  html += "</form>";
+
+  html += "<div class='log-container'>";
+  for (int i = 0; i < MAX_LOG_ENTRIES; i++) {
+    int idx = (logIndex + i) % MAX_LOG_ENTRIES;
+    if (systemLogs[idx] != "") {
+      html += "<div>" + systemLogs[idx] + "</div>";
+    }
+  }
+  html += "</div></div></body></html>";
   server.send(200, "text/html", html);
 }
 
@@ -88,8 +127,8 @@ void handleToggle() {
 void handleSet() {
   if (server.hasArg("fan"))
     webFanSpeed = server.arg("fan").toInt();
-  if (server.hasArg("strip"))
-    webStripBrightness = server.arg("strip").toInt();
+  if (server.hasArg("light"))
+    webLightBrightness = server.arg("light").toInt();
   server.sendHeader("Location", "/");
   server.send(303);
 }
@@ -125,7 +164,6 @@ void setup() {
   filter["print"]["nozzle_temper"] = true;
   filter["print"]["bed_temper"] = true;
 
-  Serial.println("WiFi Initializing...");
   WiFi.setAutoReconnect(true); // Ensure hardware auto-reconnect
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
@@ -135,13 +173,12 @@ void setup() {
   mqttClient.setCallback(mqttCallback);
 
   if (!mqttClient.setBufferSize(20480)) {
-    Serial.println("MQTT Buffer Allocation Failed!");
+    sysLog("MQTT Buffer Allocation Failed!");
   }
 }
 
 void beginServices() {
-  Serial.print("WiFi Connected. Local IP: ");
-  Serial.println(WiFi.localIP());
+  sysLog("WiFi Connected. Local IP: " + WiFi.localIP().toString());
 
   server.on("/", handleRoot);
   server.on("/toggle", handleToggle);
@@ -150,9 +187,8 @@ void beginServices() {
 
   // mDNS Setup
   if (MDNS.begin(SYSTEM_HOSTNAME)) {
-    Serial.print("mDNS responder started: http://");
-    Serial.print(SYSTEM_HOSTNAME);
-    Serial.println(".local");
+    sysLog("mDNS responder started: http://" + String(SYSTEM_HOSTNAME) +
+           ".local");
     MDNS.addService("http", "tcp", 80);
   }
 
@@ -160,7 +196,11 @@ void beginServices() {
   ArduinoOTA.setHostname("AutoExhaust-C3");
   ArduinoOTA.setPassword(OTA_PASS);
   ArduinoOTA.begin();
-  Serial.println("Network Services (Web, mDNS, OTA) Started.");
+
+  // Initialize NTP Time (GMT+9 for Korea)
+  configTime(9 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  sysLog("Network Services (Web, mDNS, OTA) Started.");
 }
 
 void reconnect() {
@@ -173,24 +213,20 @@ void reconnect() {
     String clientId = "AutoExhaust-C3-";
     clientId += String(random(0xffff), HEX);
 
-    Serial.print("Attempting MQTT connection to: ");
-    Serial.println(MQTT_SERVER);
+    sysLog("Attempting MQTT connection to: " + String(MQTT_SERVER));
 
     // Give some time for background tasks
     yield();
 
     if (mqttClient.connect(clientId.c_str(), MQTT_USER, MQTT_PASS)) {
-      Serial.println("MQTT Connected!");
-      char topic[64];
-      sprintf(topic, "device/%s/report", PRINTER_SN);
-      mqttClient.subscribe(topic);
-      Serial.print("Subscribed to: ");
-      Serial.println(topic);
+      sysLog("MQTT Connected!");
+      sprintf(msgBuffer, "device/%s/report", PRINTER_SN);
+      mqttClient.subscribe(msgBuffer);
+      sysLog("Subscribed to: " + String(msgBuffer));
     } else {
-      Serial.print("MQTT Connect Failed, rc=");
-      Serial.print(mqttClient.state());
-      Serial.print(" | WiFi RSSI: ");
-      Serial.println(WiFi.RSSI());
+      sprintf(msgBuffer, "MQTT Connect Failed, rc=%d | RSSI: %ld",
+              mqttClient.state(), WiFi.RSSI());
+      sysLog(msgBuffer);
     }
   }
 }
@@ -200,8 +236,20 @@ void update() {
     if (!mqttClient.connected())
       reconnect();
     mqttClient.loop();
-    server.handleClient();
     ArduinoOTA.handle();
+    server.handleClient();
+
+    // Periodic Status Reporting
+    static uint32_t lastStatusLog = 0;
+    if (millis() - lastStatusLog > STATUS_LOG_INTERVAL) {
+      lastStatusLog = millis();
+      sprintf(msgBuffer,
+              "PRN:%s | N:%.1f°C | B:%.1f°C | ESP:%.1f°C | FAN:%d | LIGHT:%d",
+              lastStatus.state.c_str(), lastStatus.nozzleTemp,
+              lastStatus.bedTemp, temperatureRead(), Peripherals::getFanSpeed(),
+              Peripherals::getLightBrightness());
+      sysLog(msgBuffer);
+    }
   }
 }
 

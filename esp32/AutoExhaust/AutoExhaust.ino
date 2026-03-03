@@ -10,48 +10,29 @@ uint32_t overrideTimer = 0;
 bool isRGBOverride = true;
 bool lastButtonState = HIGH;
 
-void handleButton() {
-  bool currentButton = digitalRead(PIN_BUTTON);
-
-  if (lastButtonState == HIGH && currentButton == LOW) {
-    // Button Pressed
-    isRGBOverride = true;
-    overrideTimer = millis();
-    stateTimer = millis();
-  }
-
-  else if (isRGBOverride &&
-           (millis() - overrideTimer > RGB_OVERRIDE_DURATION)) {
-    isRGBOverride = false;
-  }
-
-  lastButtonState = currentButton;
-}
+void handleButton();
+void handleThermal();
+void handleWiFi();
 
 void setup() {
   Serial.begin(115200);
   Peripherals::setup();
   Networking::setup();
+  Networking::sysLog("=== System Booting ===");
+  Networking::sysLog("Connecting to WiFi...");
 
-  // Focus only on WiFi during setup
-  Serial.print("Connecting to WiFi...");
   while (!Networking::isConnected()) {
-    delay(500);
-    Serial.print(".");
-    Peripherals::update_stateLED(STATE_SETUP);
-    Peripherals::update_rgbLED(STATE_SETUP, isRGBOverride);
+    handleWiFi();
+    delay(10);
   }
-  Serial.println("\nWiFi Connected!");
-  Networking::beginServices(); // Start Web, mDNS, OTA after IP is assigned
+  Networking::sysLog("WiFi Connected!");
+  Networking::beginServices();
 
   setCpuFrequencyMhz(DEFAULT_CPU_FREQ);
-  Serial.print("CPU Frequency set to: ");
-  Serial.print(getCpuFrequencyMhz());
-  Serial.println(" MHz");
+  String freqMsg = "CPU Frequency: " + String(getCpuFrequencyMhz()) + " MHz";
+  Networking::sysLog(freqMsg);
 
   // Enable Automatic Modem Sleep for ESP32-C3
-  // This allows the chip to sleep between WiFi beacons without losing
-  // connection
   WiFi.setSleep(true);
   esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
 
@@ -68,57 +49,28 @@ void loop() {
 
   // 2. Critical Background Tasks (Always run except in hardware sleep)
   Networking::update();
+  handleWiFi();
+  handleThermal();
 
-  // 3. Thermal Safety Check (Every 5 seconds)
-  static uint32_t lastThermalCheck = 0;
-  if (millis() - lastThermalCheck > 5000) {
-    lastThermalCheck = millis();
-    float temp = Peripherals::getChipTemperature();
-    if (temp > THERMAL_LIMIT_CRITICAL) {
-      Serial.println("!!! CRITICAL TEMP !!!");
-      delay(10000);
-      // Shutdown sequence or notify before reset could be added here
-      currentState = STATE_RESET;
-    } else if (temp > THERMAL_LIMIT_WARM) {
-      Serial.print("Warning: High Temp: ");
-      Serial.println(temp);
-      delay(1000);
-    }
-  }
-
-  // 4. Global WiFi Monitoring - Go to recovery state instead of rebooting
-  static uint32_t wifiLostTimer = 0;
-  if (!Networking::isConnected() && currentState != STATE_WIFI_LOST &&
-      currentState != STATE_RESET) {
-    if (wifiLostTimer == 0) {
-      wifiLostTimer = millis();
-    } else if (millis() - wifiLostTimer > 5000) { // 5 second grace period
-      Serial.println("\nWiFi Connection Lost! Entering recovery mode...");
-      currentState = STATE_WIFI_LOST;
-      wifiLostTimer = 0;
-    }
-  } else {
-    wifiLostTimer = 0; // Reset timer if connected or already handled
-  }
-
-  // 5. Main State Machine
+  // 3. Main State Machine
   switch (currentState) {
   case STATE_RESET:
-    Serial.println("System Rebooting...");
+    Networking::sysLog("System Rebooting...");
     delay(500);
     ESP.restart(); // Software Reset
     break;
 
   case STATE_IDLE:
     Peripherals::setFanSpeed(0);
-    Peripherals::setStripBrightness(0);
+    Peripherals::setLightBrightness(0);
 
     if (Networking::getPrinterStatus().isPrinting ||
         Networking::webManualControl) {
       currentState = STATE_RUNNING;
     } else {
-      // Stay in IDLE for at least 3 seconds to wait for MQTT before sleeping
-      if (millis() - stateTimer > 3000) {
+      // ONLY sleep if it has been 3 seconds AND WiFi is physically connected.
+      // This prevents the infinite 'no wifi -> sleep' loop.
+      if (millis() - stateTimer > 3000 && Networking::isConnected()) {
         currentState = STATE_SLEEP;
       }
     }
@@ -127,10 +79,10 @@ void loop() {
   case STATE_RUNNING:
     if (Networking::webManualControl) {
       Peripherals::setFanSpeed(Networking::webFanSpeed);
-      Peripherals::setStripBrightness(Networking::webStripBrightness);
+      Peripherals::setLightBrightness(Networking::webLightBrightness);
     } else {
       Peripherals::setFanSpeed(255);
-      Peripherals::setStripBrightness(
+      Peripherals::setLightBrightness(
           200); // 70-80% safe limit mentioned before
     }
 
@@ -142,11 +94,11 @@ void loop() {
     break;
 
   case STATE_SLEEP: {
-    Serial.println("Entering Light Sleep (Real)...");
+    Networking::sysLog("=== System Sleep ===");
     Serial.flush();
 
     Peripherals::setFanSpeed(0);
-    Peripherals::setStripBrightness(0);
+    Peripherals::setLightBrightness(0);
 
     // Configure Wakeup Sources
     esp_sleep_enable_timer_wakeup(MODEM_SLEEP_INTERVAL * 1000);
@@ -169,8 +121,7 @@ void loop() {
     while (!Serial && (millis() - waitSerial < 2000))
       ;
 
-    Serial.println("\n\n--- [SYSTEM WAKEUP SUCCESS] ---");
-    Serial.println("If this is visible, the USB connection was recovered.");
+    Networking::sysLog("=== System Wakeup ===");
 
     currentState = STATE_IDLE;
     stateTimer = millis();
@@ -179,10 +130,10 @@ void loop() {
 
   case STATE_WIFI_LOST:
     Peripherals::setFanSpeed(0);
-    Peripherals::setStripBrightness(0);
+    Peripherals::setLightBrightness(0);
 
     if (Networking::isConnected()) {
-      Serial.println("WiFi Restored. Returning to IDLE.");
+      Networking::sysLog("WiFi Restored. Returning to IDLE.");
       currentState = STATE_IDLE;
       stateTimer = millis();
     }
@@ -190,4 +141,66 @@ void loop() {
   }
 
   delay(10);
+}
+
+void handleButton() {
+  bool currentButton = digitalRead(PIN_BUTTON);
+
+  if (lastButtonState == HIGH && currentButton == LOW) {
+    // Button Pressed
+    isRGBOverride = true;
+    overrideTimer = millis();
+    stateTimer = millis();
+  }
+
+  else if (isRGBOverride &&
+           (millis() - overrideTimer > RGB_OVERRIDE_DURATION)) {
+    isRGBOverride = false;
+  }
+
+  lastButtonState = currentButton;
+}
+
+void handleThermal() {
+  static uint32_t lastThermalCheck = 0;
+  if (millis() - lastThermalCheck > 5000) {
+    lastThermalCheck = millis();
+    float temp = temperatureRead();
+    if (temp > THERMAL_LIMIT_CRITICAL) {
+      Networking::sysLog("!!! CRITICAL TEMP !!!");
+      delay(10000);
+      currentState = STATE_RESET;
+    } else if (temp > THERMAL_LIMIT_WARM) {
+      char tBuf[32];
+      sprintf(tBuf, "Warning: CPU Temp High: %.1f", temp);
+      Networking::sysLog(tBuf);
+    }
+  }
+}
+
+void handleWiFi() {
+  if (Networking::isConnected()) {
+    return;
+  }
+
+  // Common Progress Visuals (Dots + LEDs)
+  static uint32_t lastVisualUpdate = 0;
+  if (millis() - lastVisualUpdate > 500) {
+    lastVisualUpdate = millis();
+    Serial.print(".");
+    Peripherals::update_stateLED(STATE_SETUP);
+    Peripherals::update_rgbLED(STATE_SETUP, isRGBOverride);
+  }
+
+  // State Transition Logic (Only during runtime, not initial setup)
+  if (currentState != STATE_WIFI_LOST && currentState != STATE_RESET) {
+    static uint32_t wifiLostTimer = 0;
+    if (wifiLostTimer == 0) {
+      wifiLostTimer = millis();
+    } else if (millis() - wifiLostTimer > 5000) {
+      Networking::sysLog("WiFi Connection Lost! Entering recovery mode...");
+      currentState = STATE_WIFI_LOST;
+      wifiLostTimer = 0;
+    }
+  }
 }
