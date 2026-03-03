@@ -1,5 +1,6 @@
 #include "Networking.h"
 #include "Peripherals.h"
+#include <stdarg.h>
 
 namespace Networking {
 static WiFiClientSecure secureClient;
@@ -19,42 +20,40 @@ static char msgBuffer[128]; // Shared buffer for string formatting
 static bool isPartialLine = false;
 
 void sysLog(const char *format, ...) {
-  char buffer[256];
+  char buffer[512]; // Increased buffer for complex logs
   va_list args;
   va_start(args, format);
   vsnprintf(buffer, sizeof(buffer), format, args);
   va_end(args);
 
-  if (!isPartialLine) {
-    time_t now = time(nullptr);
-    char timeBuf[20];
-    if (now > 100000) { // If NTP is synced
-      struct tm *lt = localtime(&now);
-      sprintf(timeBuf, "[%02d:%02d:%02d] ", lt->tm_hour, lt->tm_min,
-              lt->tm_sec);
-    } else {
-      uint32_t t = millis() / 1000;
-      sprintf(timeBuf, "[UP:%02d:%02d:%02d] ", (int)(t / 3600) % 24,
-              (int)(t / 60) % 60, (int)t % 60);
+  for (const char *p = buffer; *p; p++) {
+    // 1. If we are starting a fresh line, print/store the timestamp
+    if (!isPartialLine) {
+      time_t now = time(nullptr);
+      char timeBuf[20];
+      if (now > 100000) {
+        struct tm *lt = localtime(&now);
+        sprintf(timeBuf, "[%02d:%02d:%02d] ", lt->tm_hour, lt->tm_min,
+                lt->tm_sec);
+      } else {
+        uint32_t t = millis() / 1000;
+        sprintf(timeBuf, "[UP:%02d:%02d:%02d] ", (int)(t / 3600) % 24,
+                (int)(t / 60) % 60, (int)t % 60);
+      }
+      Serial.print(timeBuf);
+      systemLogs[logIndex] = String(timeBuf);
+      isPartialLine = true;
     }
-    Serial.print(timeBuf);
-    systemLogs[logIndex] = String(timeBuf);
-    isPartialLine = true;
-  }
 
-  Serial.print(buffer);
-
-  // Clean string for web logs (remove internal newlines for UI consistency)
-  String msg = String(buffer);
-  bool endsWithNewline = msg.endsWith("\n");
-  if (endsWithNewline) {
-    msg.remove(msg.length() - 1);
-  }
-  systemLogs[logIndex] += msg;
-
-  if (endsWithNewline) {
-    logIndex = (logIndex + 1) % MAX_LOG_ENTRIES;
-    isPartialLine = false;
+    // 2. Handle the character
+    if (*p == '\n') {
+      Serial.println();
+      logIndex = (logIndex + 1) % MAX_LOG_ENTRIES;
+      isPartialLine = false;
+    } else {
+      Serial.print(*p);
+      systemLogs[logIndex] += *p;
+    }
   }
 }
 
@@ -198,7 +197,7 @@ void setup() {
 }
 
 void beginServices() {
-  sysLog("WiFi Connected. Local IP: " + WiFi.localIP().toString());
+  sysLog("Local IP: %s\n", WiFi.localIP().toString().c_str());
 
   server.on("/", handleRoot);
   server.on("/toggle", handleToggle);
@@ -207,8 +206,7 @@ void beginServices() {
 
   // mDNS Setup
   if (MDNS.begin(SYSTEM_HOSTNAME)) {
-    sysLog("mDNS responder started: http://" + String(SYSTEM_HOSTNAME) +
-           ".local");
+    sysLog("mDNS responder started: http://%s.local\n", SYSTEM_HOSTNAME);
     MDNS.addService("http", "tcp", 80);
   }
 
@@ -233,18 +231,18 @@ void reconnect() {
     String clientId = "AutoExhaust-C3-";
     clientId += String(random(0xffff), HEX);
 
-    sysLog("Attempting MQTT connection to: " + String(MQTT_SERVER));
+    sysLog("Attempting MQTT connection to: %s\n", MQTT_SERVER);
 
     // Give some time for background tasks
     yield();
 
-    if (mqttClient.connect(clientId.c_str(), MQTT_USER, MQTT_PASS)) {
-      sysLog("MQTT Connected!");
+    if (mqttClient.connect(clientId.c_str())) {
+      sysLog("MQTT Connected!\n");
       sprintf(msgBuffer, "device/%s/report", PRINTER_SN);
       mqttClient.subscribe(msgBuffer);
-      sysLog("Subscribed to: " + String(msgBuffer));
+      sysLog("Subscribed to: %s\n", msgBuffer);
     } else {
-      sprintf(msgBuffer, "MQTT Connect Failed, rc=%d | RSSI: %ld",
+      sprintf(msgBuffer, "MQTT Connect Failed, rc=%d | RSSI: %ld\n",
               mqttClient.state(), WiFi.RSSI());
       sysLog(msgBuffer);
     }
@@ -252,24 +250,28 @@ void reconnect() {
 }
 
 void update() {
-  if (WiFi.status() == WL_CONNECTED) {
-    if (!mqttClient.connected())
-      reconnect();
-    mqttClient.loop();
-    ArduinoOTA.handle();
-    server.handleClient();
+  server.handleClient();
+  ArduinoOTA.handle();
 
-    // Periodic Status Reporting
-    static uint32_t lastStatusLog = 0;
-    if (millis() - lastStatusLog > STATUS_LOG_INTERVAL) {
-      lastStatusLog = millis();
-      sprintf(msgBuffer,
-              "PRN:%s | N:%.1f°C | B:%.1f°C | ESP:%.1f°C | FAN:%d | LIGHT:%d",
-              lastStatus.state.c_str(), lastStatus.nozzleTemp,
-              lastStatus.bedTemp, temperatureRead(), Peripherals::getFanSpeed(),
-              Peripherals::getLightBrightness());
-      sysLog(msgBuffer);
+  // 2. Handle Network-dependent MQTT
+  if (isConnected()) {
+    if (!mqttClient.connected()) {
+      reconnect();
     }
+    mqttClient.loop();
+  }
+
+  // 3. Periodic Status Logging (Independent of WiFi state)
+  static uint32_t lastStatusLog = 0;
+  if (millis() - lastStatusLog > STATUS_LOG_INTERVAL) {
+    lastStatusLog = millis();
+    sprintf(msgBuffer,
+            "PRN:%s | N:%.1f°C | B:%.1f°C | ESP:%.1f°C | FAN:%d | LIGHT:%d | "
+            "RSSI: %ld\n",
+            lastStatus.state.c_str(), lastStatus.nozzleTemp, lastStatus.bedTemp,
+            temperatureRead(), Peripherals::getFanSpeed(),
+            Peripherals::getLightBrightness(), WiFi.RSSI());
+    sysLog(msgBuffer);
   }
 }
 

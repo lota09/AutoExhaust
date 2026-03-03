@@ -19,22 +19,20 @@ void setup() {
   Peripherals::setup();
   Networking::setup();
   Networking::sysLog("=== System Booting ===\n");
-  Networking::sysLog("Connecting to WiFi"); // No \n, starts inline
+  Networking::sysLog("Connecting to WiFi");
 
   while (!Networking::isConnected()) {
     handleWiFi();
     delay(10);
   }
-  Networking::sysLog(" WiFi Connected!\n"); // Ends inline
   Networking::beginServices();
 
   setCpuFrequencyMhz(DEFAULT_CPU_FREQ);
-  String freqMsg = "CPU Frequency: " + String(getCpuFrequencyMhz()) + " MHz\n";
-  Networking::sysLog(freqMsg);
+  Networking::sysLog("CPU Frequency: %d MHz\n", getCpuFrequencyMhz());
 
-  // Disable internal modem sleep to prevent conflict with manual light sleep
-  WiFi.setSleep(false);
-  esp_wifi_set_ps(WIFI_PS_NONE);
+  // Enable Automatic Modem Sleep for ESP32-C3
+  WiFi.setSleep(true);
+  esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
 
   currentState = STATE_IDLE;
   stateTimer = millis();
@@ -180,6 +178,7 @@ void handleWiFi() {
   static uint32_t wifiLostTimer = 0;
 
   if (Networking::isConnected()) {
+    Networking::sysLog("WiFi Connected!\n");
     wifiLostTimer = 0; // Reset timer when connected
     return;
   }
@@ -200,7 +199,7 @@ void handleWiFi() {
   static uint32_t lastVisualUpdate = 0;
   if (millis() - lastVisualUpdate > 500) {
     lastVisualUpdate = millis();
-    Networking::sysLog(".", false);
+    Networking::sysLog("."); // Progress dot
     Peripherals::update_stateLED(STATE_SETUP);
     Peripherals::update_rgbLED(STATE_SETUP, isRGBOverride);
   }
