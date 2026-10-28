@@ -1,0 +1,267 @@
+##### 2026-10-27 14:14:39
+=== WiFi Stability Test ===
+Profile      : P1 TX 19.5dBm (baseline)
+Uptime       : 0d 00:00:11
+Boots        : 8 (last reset: SW)
+Brownout/Crash/WD-restart : 0 / 0 / 0
+
+[WiFi]
+Link         : UP 0d 00:00:05
+Boot connect : 4608 ms after 0 failed attempts
+Drops        : 0 (disconnect events 0, manual retries 0)
+Offline      : total 0d 00:00:00, longest 0.0 s
+RSSI         : now -70, min -69, max -67, avg -68.2
+Channel / TX : 6 / 19.5 dBm, sleep OFF
+
+[MQTT]
+Connected    : YES | connects 1, failures 0 (last rc 0)
+Messages     : 3 (45 KB), last 0 s ago
+Max msg gap  : 1.3 s
+
+[System]
+Chip temp    : 59.3 C
+Heap         : free 122348, min 109916
+
+[Last disconnects]
+
+##### 2026-10-27 14:19:40
+=== WiFi Stability Test ===
+Profile      : P1 TX 19.5dBm (baseline)
+Uptime       : 0d 00:05:12
+Boots        : 8 (last reset: SW)
+Brownout/Crash/WD-restart : 0 / 0 / 0
+
+[WiFi]
+Link         : UP 0d 00:05:05
+Boot connect : 4608 ms after 0 failed attempts
+Drops        : 0 (disconnect events 0, manual retries 0)
+Offline      : total 0d 00:00:00, longest 0.0 s
+RSSI         : now -74, min -75, max -46, avg -69.0
+Channel / TX : 6 / 19.5 dBm, sleep OFF
+
+[MQTT]
+Connected    : YES | connects 1, failures 0 (last rc 0)
+Messages     : 257 (3870 KB), last 0 s ago
+Max msg gap  : 1.7 s
+
+[System]
+Chip temp    : 60.3 C
+Heap         : free 122380, min 109560
+
+[Last disconnects]
+
+##### 2026-10-27 14:24:40
+=== WiFi Stability Test ===
+Profile      : P3 TX 8.5dBm
+Uptime       : 0d 00:00:09
+Boots        : 1 (last reset: SW)
+Brownout/Crash/WD-restart : 0 / 0 / 0
+
+[WiFi]
+Link         : UP 0d 00:00:03
+Boot connect : 5097 ms after 0 failed attempts
+Drops        : 0 (disconnect events 0, manual retries 0)
+Offline      : total 0d 00:00:00, longest 0.0 s
+RSSI         : now -72, min -72, max -70, avg -71.0
+Channel / TX : 6 / 8.5 dBm, sleep OFF
+
+[MQTT]
+Connected    : YES | connects 1, failures 0 (last rc 0)
+Messages     : 1 (15 KB), last 0 s ago
+Max msg gap  : 0.0 s
+
+[System]
+Chip temp    : 59.3 C
+Heap         : free 121844, min 111432
+
+[Last disconnects]
+
+##### 2026-10-27 14:29:47
+!!! UNREACHABLE
+
+##### 2026-10-27 14:34:57
+!!! UNREACHABLE
+
+##### 2026-10-27 14:40:07
+!!! UNREACHABLE
+
+##### 2026-10-27 14:45:17
+!!! UNREACHABLE
+
+##### 2026-10-27 14:50:27
+!!! UNREACHABLE
+
+##### 2026-10-27 14:55:38
+!!! UNREACHABLE
+
+##### 2026-10-27 15:00:48
+!!! UNREACHABLE
+
+##### 2026-10-27 15:05:58
+!!! UNREACHABLE
+
+##### 2026-10-27 15:11:08
+!!! UNREACHABLE
+
+##### 2026-10-27 15:16:18
+!!! UNREACHABLE
+
+##### 2026-10-27 15:21:28
+!!! UNREACHABLE
+
+##### 2026-10-27 15:26:38
+!!! UNREACHABLE
+
+##### 2026-10-27 15:31:49
+!!! UNREACHABLE
+
+##### 2026-10-27 15:36:59
+!!! UNREACHABLE
+
+##### 2026-10-27 15:42:09
+!!! UNREACHABLE
+
+##### 2026-10-27 15:47:19
+!!! UNREACHABLE
+
+##### 2026-10-27 15:52:29
+!!! UNREACHABLE
+
+##### 2026-10-27 15:57:39
+!!! UNREACHABLE
+
+##### 2026-10-27 16:02:49
+!!! UNREACHABLE
+
+##### 2026-10-27 16:08:00
+!!! UNREACHABLE
+
+##### 2026-10-27 16:13:10
+!!! UNREACHABLE
+
+##### 2026-10-27 16:18:20
+!!! UNREACHABLE
+
+##### 2026-10-27 16:23:30
+!!! UNREACHABLE
+
+##### 2026-10-27 16:28:40
+!!! UNREACHABLE
+
+##### 2026-10-27 16:33:50
+!!! UNREACHABLE
+
+##### 2026-10-27 16:39:01
+!!! UNREACHABLE
+
+##### 2026-10-27 16:44:11
+!!! UNREACHABLE
+
+##### 2026-10-27 16:49:21
+!!! UNREACHABLE
+
+##### 2026-10-27 16:54:31
+!!! UNREACHABLE
+
+##### 2026-10-27 16:59:41
+!!! UNREACHABLE
+
+##### 2026-10-27 17:04:51
+!!! UNREACHABLE
+
+##### 2026-10-27 17:10:02
+!!! UNREACHABLE
+
+##### 2026-10-27 17:15:12
+!!! UNREACHABLE
+
+##### 2026-10-27 17:20:22
+!!! UNREACHABLE
+
+##### 2026-10-27 17:25:32
+!!! UNREACHABLE
+
+##### 2026-10-27 17:30:42
+!!! UNREACHABLE
+
+##### 2026-10-27 17:35:52
+!!! UNREACHABLE
+
+##### 2026-10-27 17:41:02
+!!! UNREACHABLE
+
+##### 2026-10-27 17:46:13
+!!! UNREACHABLE
+
+##### 2026-10-27 17:51:23
+!!! UNREACHABLE
+
+##### 2026-10-27 17:56:33
+!!! UNREACHABLE
+
+##### 2026-10-27 18:01:43
+!!! UNREACHABLE
+
+##### 2026-10-27 18:06:53
+!!! UNREACHABLE
+
+##### 2026-10-27 18:12:03
+!!! UNREACHABLE
+
+##### 2026-10-27 18:17:13
+!!! UNREACHABLE
+
+##### 2026-10-27 18:22:24
+!!! UNREACHABLE
+
+##### 2026-10-27 18:27:34
+!!! UNREACHABLE
+
+##### 2026-10-27 18:32:44
+!!! UNREACHABLE
+
+##### 2026-10-27 18:37:54
+!!! UNREACHABLE
+
+##### 2026-10-27 18:43:04
+!!! UNREACHABLE
+
+##### 2026-10-27 18:48:14
+!!! UNREACHABLE
+
+##### 2026-10-27 18:53:25
+!!! UNREACHABLE
+
+##### 2026-10-27 18:58:35
+!!! UNREACHABLE
+
+##### 2026-10-27 19:03:45
+!!! UNREACHABLE
+
+##### 2026-10-27 19:08:55
+!!! UNREACHABLE
+
+##### 2026-10-27 19:14:05
+!!! UNREACHABLE
+
+##### 2026-10-27 19:19:15
+!!! UNREACHABLE
+
+##### 2026-10-27 19:24:25
+!!! UNREACHABLE
+
+##### 2026-10-27 19:29:36
+!!! UNREACHABLE
+
+##### 2026-10-27 19:34:46
+!!! UNREACHABLE
+
+##### 2026-10-27 19:39:56
+!!! UNREACHABLE
+
+##### 2026-10-27 19:45:06
+!!! UNREACHABLE
+
+##### 2026-10-27 19:50:16
+!!! UNREACHABLE
+

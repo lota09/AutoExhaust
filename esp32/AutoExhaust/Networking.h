@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include <ArduinoOTA.h>
 #include <ESPmDNS.h>
+#include <Preferences.h>
 #include <PubSubClient.h>
 #include <WebServer.h>
 #include <WiFi.h>
@@ -18,24 +19,30 @@ struct PrinterStatus {
   float nozzleTemp;
   float bedTemp;
   bool isPrinting;
+  bool chamberLightOn;
 };
 
 void setup();
-void beginServices();
 void update();
 void sysLog(const char *format, ...);
 
 // Connectivity
-bool isConnected();
-void reconnect();
+bool isConnected();      // WiFi
+bool isMqttConnected();  // MQTT session
+bool isPrinterOnline();  // MQTT up and reports are fresh
 
 // Status Access
-PrinterStatus getPrinterStatus();
+const PrinterStatus &getPrinterStatus();
+bool setChamberLight(bool on);
 
-// Web Control values
-extern int webFanSpeed;
-extern int webLightBrightness;
-extern bool webManualControl;
+// Dashboard info from the state machine
+void setStateInfo(const char *name, uint32_t remainingMs, const char *fault);
+enum ManualRequest { MANUAL_NONE, MANUAL_OFF, MANUAL_ON, MANUAL_TOGGLE };
+ManualRequest takeManualRequest(); // Web/API request, cleared on read
+
+// Web settings (persisted in NVS)
+extern uint8_t fanDuty;
+extern uint8_t lightDuty;
 } // namespace Networking
 
 #endif

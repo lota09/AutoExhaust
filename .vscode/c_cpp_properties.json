@@ -1,0 +1,14 @@
+{
+  // IntelliSense uses the compile database arduino-cli writes on every build.
+  // Build a sketch once ("ESP32: Build") to activate it.
+  "configurations": [
+    {
+      "name": "ESP32-C3",
+      "compileCommands": [
+        "${workspaceFolder}/.build/AutoExhaust/compile_commands.json",
+        "${workspaceFolder}/.build/WiFi_Stability/compile_commands.json"
+      ]
+    }
+  ],
+  "version": 4
+}

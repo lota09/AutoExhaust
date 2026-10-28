@@ -1,88 +1,79 @@
 # 🌀 AutoExhaust 2.0 시스템 상태 설계서
 
-## 1. 개요 및 하드웨어 사양
-- **Modem Sleep**: MQTT 메시지 수신을 위해 WiFi 연결을 유지하며 10초 주기로 인터럽트 확인.
-- **RGB 인터럽트**: 어느 상태에서든 버튼이 눌리면 **5초간 전원 상태** 표시 후 기존 상태로 복귀.
+## 1. 개요
+- 프린터(Bambu X1C)의 MQTT 상태를 받아서 배기팬과 LED 스트립을 자동으로 켜고 끕니다.
+- **슬립은 사용하지 않습니다.** WiFi 라디오가 항상 켜져 있고(`WiFi.setSleep(false)`), TX 출력은 8.5dBm입니다. 근거는 `Hardware_Test/WiFi_Stability`에서 측정한 결과입니다.
+- 웹 대시보드(`/`)와 REST API(`/api/*`, [API.md](API.md))로 제어할 수 있습니다.
+- 모든 수치(시간, 임계값, 상한)는 `Config.h` 한 곳에 모여 있습니다.
 
-
-## 2. 시스템 상태 다이어그램 (State Machine)
+## 2. 상태 다이어그램
 
 ```mermaid
 stateDiagram-v2
     direction TB
-
-    [*] --> State_Reset
-    
-    state "🚀_Reset_Init" as State_Reset
-    state "🏠_IDLE_Standby" as State_IDLE
-    state "🌀_Running_Active" as State_Running
-    state "😴_Modem_Sleep" as State_Sleep
-
-    State_Reset --> State_IDLE : Start
-
-    State_IDLE --> State_Running : Job_Detected
-    State_IDLE --> State_Sleep : No_Job_Found
-
-    State_Running --> State_IDLE : Job_Finished
-
-    State_Sleep --> State_IDLE : Timer_Interrupt
-    State_Sleep --> State_IDLE : Button_Interrupt
-
-    State_IDLE --> State_Reset : WiFi_Lost
-    State_Running --> State_Reset : WiFi_Lost
+    [*] --> BOOT
+    BOOT --> IDLE : 첫 리포트 (출력 중 아님)
+    BOOT --> RUNNING : 첫 리포트 (출력 중)
+    IDLE --> RUNNING : 출력 시작
+    RUNNING --> COOLDOWN : 출력 종료
+    COOLDOWN --> RUNNING : 출력 재시작
+    COOLDOWN --> IDLE : 5분 경과
+    IDLE --> MANUAL : 수동 환기 ON
+    COOLDOWN --> MANUAL : 수동 환기 ON
+    MANUAL --> IDLE : OFF / 60분 경과
+    MANUAL --> RUNNING : 출력 시작 (인계)
+    IDLE --> OFFLINE : 통신 끊김
+    RUNNING --> OFFLINE : 통신 끊김
+    COOLDOWN --> OFFLINE : 통신 끊김
+    OFFLINE --> RUNNING : 복구 (출력 중)
+    OFFLINE --> COOLDOWN : 복구 (출력 끝남)
+    OFFLINE --> IDLE : 복구 (그 외)
+    FAULT --> BOOT : 버튼 2초 (해제)
 ```
+`FAULT`로는 어느 상태에서든 들어갈 수 있습니다(저전압, 칩 과열).
 
+## 3. 상태별 동작
 
-## 3. 세부 상태 정의 (Detailed State)
+| 상태 | 팬 | 조명 | RGB | 비고 |
+|---|---|---|---|---|
+| BOOT | OFF | OFF | 전원 상태 색 | 첫 프린터 리포트를 기다리는 중 |
+| IDLE | OFF | OFF | 꺼짐 | |
+| RUNNING | ON | ON | 무지개 | `PREPARE`, `RUNNING`, `PAUSE`일 때. 진입하면 프린터 챔버 조명 ON |
+| COOLDOWN | 5분 | 1분 | 파란 Breathing | 조명이 꺼질 때 챔버 조명도 OFF |
+| MANUAL | ON | ON | 보라 | 60분 뒤 자동 해제. 출력이 시작되면 RUNNING으로 넘어감 |
+| OFFLINE | 유지 | 유지 | 주황 깜빡임 | 출력 중에 끊겼으면 최대 30분 유지, 쿨다운 중이었으면 쿨다운을 이어감 |
+| FAULT | OFF | OFF | 빨강 빠른 깜빡임 | 래치 상태. 버튼으로만 해제 |
 
-### 🚀 Reset_Init 상태
-- **시스템 초기화**: GPIO 설정, ADC 보정, 무선 통신(WiFi) 및 MQTT 초기화를 수행합니다.
-- **웹 서버 구동**: 리셋 직후 웹페이지 제어 로직을 생성하여 관리자 접속을 준비합니다.
-- **내장 LED**: 네트워크 연결 시도 시점부터 **1Hz 간격으로 점등**하여 초기화 중임을 알립니다.
+- ON일 때의 세기는 웹이나 API에서 정한 **설정값**을 씁니다. 기본값은 팬 100%, 조명 70%이고, NVS에 저장되어 재부팅 후에도 유지됩니다.
+- **통신 끊김**의 기준은 WiFi 끊김, MQTT 끊김, 또는 60초 동안 리포트가 오지 않는 경우입니다.
 
-### 🏠 IDLE_Standby 상태
-- **감시**: MQTT 브로커로부터 `print_running` 메시지가 오는지 상시 모니터링합니다.
-- **내장 LED**: WiFi 및 MQTT 연결이 완료되면 **상시 점등(ON)**으로 전환됩니다.
-- **전환**: 
-    - `print_running` 수신 시 → **Running_Active**로 전환.
-    - 일정 시간(체크 후 즉시) 작업이 없으면 → **Modem_Sleep**으로 전환.
+## 4. 세부 동작
 
-### 🌀 Running_Active 상태
-- **출력 가동**: 팬(Fan)과 LED 스트립을 미리 설정된 밝기/속도로 활성함니다.
-- **시각 효과**: RGB LED가 무지개(Rainbow) 루프로 점등되어 가동 중임을 알립니다.
-- **내장 LED**: **상시 점등(ON)** 상태를 유지합니다.
-- **전환**: `print_finish` 또는 에러 메시지 수신 시 → **IDLE_Standby**로 복귀.
+### 💡 내장 LED (WiFi 상태 전용)
+- **ON**: WiFi와 MQTT 모두 연결됨
+- **1Hz 깜빡임**: WiFi만 연결됨
+- **4Hz 깜빡임**: WiFi 끊김
 
-### 😴 Modem_Sleep 상태
-- **동작**: 시스템 부하가 없을 때 전력 소모를 줄이기 위해 WiFi 라디오를 끄지 않고 CPU만 가볍게 재우는 Modem Sleep에 진입합니다.
-- **내장 LED**: 수면 중에는 **소등(OFF)** 됩니다.
-- **웨이크업(Wakeup)**: 
-    1. **10 Second Timer Interrupt**: 10초마다 자동으로 깨어나 메시지를 확인합니다.
-    2. **Button Interrupt**: 물리 버튼 클릭 시 즉시 깨어나 IDLE 상태로 복원됩니다.
+### 🔘 버튼 (GPIO9: 부팅 스트랩 핀)
+모든 동작은 **버튼을 뗄 때** 실행됩니다. 누르고 있는 동안 리셋이 일어나서 다운로드 모드로 들어가는 일을 막기 위해서입니다. 부팅할 때 이미 눌려 있던 입력은 한 번 뗄 때까지 무시합니다.
 
-## 4. 세부 동작 정의 (Detailed Logic)
+| 누른 시간 | 누르는 중 RGB | 뗐을 때 동작 |
+|---|---|---|
+| 2초 미만 | 변화 없음 | 전원 상태 색을 5초간 표시 |
+| 2~10초 | 청록 | 수동 환기 ON/OFF (FAULT 상태에서는 FAULT 해제) |
+| 10초 이상 | 흰색 | 재부팅 |
 
-### 💡 내장 LED 상태 매핑
-- **OFF**: 😴_Sleep 상태 혹은 전원 OFF
-- **1Hz Blink**: 📡_Networking (연결 중)
-- **ON**: 🏠_IDLE 또는 🌀_Running (연결 완료)
+### 🔋 전원 보호 (12V 1.5A)
+- 조명 상한은 70%(`MAX_LIGHT_DUTY`)이며 웹이나 API로도 넘을 수 없습니다.
+- 조명은 1초에 걸친 소프트 램프로 켜고 끕니다.
+- 팬은 25kHz PWM입니다. duty가 100% 미만이면 처음 1초는 100%로 돌려 기동시키고(킥스타트), 최소 duty는 30%입니다.
+- 전압은 감시만 하고 그 값으로 출력을 조절하지는 않습니다(피드백 제어 없음). 부하가 켜진 상태에서 10.5V 미만이 2초 넘게 이어지면 **FAULT 래치**가 걸립니다. 5V 미만은 12V가 꺼진 상태(USB 전원만 연결)로 보고 FAULT로 처리하지 않습니다.
+- RGB 전원 색 기준은 11.6V 초과면 초록, 11.0V 초과면 노랑, 그 이하면 빨강입니다. **부하를 건 상태에서 실측한 뒤 다시 정해야 합니다.**
 
-### 🌈 RGB_Power_Display (Global)
-- **트리거**: 상태와 관계없이 버튼 클릭 시 발생.
-- **동작**: 전압(ADC) 데이터를 기반으로 특정 색상 점등.
-- **복귀**: **5초 경과 후** 버튼을 누르기 전의 원래 상태와 동작(예: 무지개 루프 등)으로 자동 복구.
-
-### 🔋 Modem Sleep 전략
-- 고전력 Deep Sleep 대신 **Modem Sleep(Light Sleep)**을 채택하여 WiFi 연결을 유지합니다.
-- 10초 주기로 깨어나 MQTT 브로커로부터 메시지를 확인하며, 불필요한 재연결 전력 소모를 방지합니다.
-
-### 🌐 웹 제어 인터페이스
-- 리셋 직후 웹페이지 제어 로직을 초기화하여 사용자 접속 준비를 마칩니다.
-- 실시간 팬 속도 조절 및 LED 스트립 밝기 설정을 지원합니다.
-
-### 🛡️ 예외 처리 (Fail-safe)
-- **WiFi 유실**: `Sleep` 상태를 제외한 모든 상태에서 네트워크 연결이 끊어지면 안전을 위해 `State_Reset`으로 돌아가 재연결 및 초기화 프로세스를 수행합니다.
-- **인터럽트 방어**: 버튼 입력에 의한 전원 상태 표시 로직은 주 프로세스의 흐름을 방해하지 않도록 설계되었습니다.
+### 📡 WiFi 감시
+- 끊긴 이유(reason 코드)를 로그에 남깁니다.
+- 30초 넘게 끊겨 있으면 `disconnect()` 후 `begin()`으로 수동 재접속합니다.
+- 5분 넘게 끊겨 있으면 재부팅합니다.
 
 ---
-**최종 수정일**: 2026-03-01
+**최종 수정일**: 2026-10-28

@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include <Arduino.h>
+#include <WiFi.h>
 
 #include "secrets.h"
 
@@ -15,6 +16,11 @@ const char *const MQTT_USER = SECRET_MQTT_USER;
 const char *const MQTT_PASS = SECRET_MQTT_PASS;
 const char *const PRINTER_SN = SECRET_PRINTER_SN;
 const char *const OTA_PASS = SECRET_OTA_PASS;
+#ifdef SECRET_API_TOKEN
+const char *const API_TOKEN = SECRET_API_TOKEN; // POST /api/* needs Bearer
+#else
+const char *const API_TOKEN = ""; // Empty: API open to the LAN
+#endif
 
 // --- Pin Definitions ---
 const int PIN_RGB_R = 0;
@@ -22,32 +28,70 @@ const int PIN_RGB_G = 1;
 const int PIN_RGB_B = 10;
 const int PIN_FAN = 4;     // MOSFET 1
 const int PIN_LIGHT = 5;   // MOSFET 2
-const int PIN_PROBE = 3;   // ADC Node A
-const int PIN_BUILTIN = 8; // Internal LED
-const int PIN_BUTTON = 9;  // Tact Button (Default Boot button)
+const int PIN_PROBE = 3;   // ADC Node A (100k / 20k divider)
+const int PIN_BUILTIN = 8; // Internal LED (WiFi status only)
+const int PIN_BUTTON = 9;  // Tact Button (Default Boot button, strapping pin)
 
 // --- PWM Settings ---
-const int PWM_FREQ = 5000;
-const int PWM_RES = 8; // 0-255
+const int PWM_FREQ = 5000;      // RGB + LED strip
+const int FAN_PWM_FREQ = 25000; // 2-pin fan: above audible range
+const int PWM_RES = 8;          // 0-255
+
+// --- Load Limits (12V 1.5A PSU, 2 LED strips ~1.33A + fan) ---
+const uint8_t MAX_LIGHT_DUTY = 178; // ~70%: keeps total under ~80% of PSU
+const uint8_t MIN_FAN_DUTY = 77;    // ~30%: 2-pin fans may stall below this
+const uint8_t DEFAULT_FAN_DUTY = 255;
+const uint8_t DEFAULT_LIGHT_DUTY = MAX_LIGHT_DUTY;
+const uint32_t FAN_KICKSTART_MS = 1000; // Full power on start if duty < 100%
+const uint32_t LIGHT_RAMP_MS = 1000;    // Soft start 0 -> 255
+
+// --- Automation Timing ---
+const uint32_t COOLDOWN_FAN_MS = 5 * 60000UL;   // Fan run-on after print
+const uint32_t COOLDOWN_LIGHT_MS = 60000UL;     // Light run-on after print
+const uint32_t OFFLINE_HOLD_MS = 30 * 60000UL;  // Keep running if link lost
+const uint32_t MANUAL_TIMEOUT_MS = 60 * 60000UL; // Manual vent auto-off
+const uint32_t PRINTER_STALE_MS = 60000;   // No report -> printer offline
+const uint32_t PUSHALL_QUIET_MS = 20000;   // Request full report if quiet
+const bool CHAMBER_LIGHT_SYNC = true; // Printer light on at start, off w/ strip
+
+// --- WiFi (Hardware_Test/WiFi_Stability results) ---
+// 8.5 dBm was equal on the bench; final location RSSI is ~-77, so keep
+// more uplink margin
+const wifi_power_t WIFI_TX_POWER = WIFI_POWER_11dBm;
+const uint32_t WIFI_RETRY_AFTER = 30000;    // Kick reconnect after 30 s down
+const uint32_t WIFI_RESTART_AFTER = 300000; // Reboot after 5 min down
+
+// --- Power Monitor (thresholds: re-measure under full load) ---
+const float DIVIDER_RATIO = 6.0;  // (100k + 20k) / 20k
+const float VOLT_PRESENT = 5.0;   // Below: 12V off (USB only), not a fault
+const float VOLT_GOOD = 11.6;     // RGB green above
+const float VOLT_LOW = 11.0;      // RGB yellow above, red below
+const float VOLT_FAULT = 10.5;    // Latching fault while loads are on
+const uint32_t VOLT_FAULT_MS = 2000;
+
+// --- Button ---
+const uint32_t BUTTON_DEBOUNCE_MS = 30;
+const uint32_t BUTTON_LONG_MS = 2000;    // Release: manual vent / clear fault
+const uint32_t BUTTON_REBOOT_MS = 10000; // Release: reboot
 
 // --- Logic Constants ---
 const int DEFAULT_CPU_FREQ =
     80; // MHz (80 recommended for WiFi/Thermal balance)
-const uint32_t MODEM_SLEEP_INTERVAL = 10000; // 10 seconds
-const uint32_t STATUS_LOG_INTERVAL = 1000;   // Log status every 1s (debug)
+const uint32_t STATUS_LOG_INTERVAL = 60000;  // Periodic status log
 const uint32_t RGB_OVERRIDE_DURATION = 5000; // 5 seconds
-const float THERMAL_LIMIT_WARM = 65.0;       // Warning: Slow down or Notify
-const float THERMAL_LIMIT_CRITICAL = 80.0;   // Danger: Shutdown everything
+const float THERMAL_LIMIT_WARM = 65.0;       // Warning log only
+const float THERMAL_LIMIT_CRITICAL = 80.0;   // Latching fault
 const int MAX_LOG_ENTRIES = 50;              // Max logs displayed in web UI
 
 // --- System States ---
 enum SystemState {
-  STATE_SETUP,
-  STATE_RESET,
+  STATE_BOOT,     // Waiting for first printer report
   STATE_IDLE,
-  STATE_RUNNING,
-  STATE_SLEEP,
-  STATE_WIFI_LOST
+  STATE_RUNNING,  // Printing
+  STATE_COOLDOWN, // Run-on after print
+  STATE_MANUAL,   // Manual vent
+  STATE_OFFLINE,  // WiFi / MQTT lost
+  STATE_FAULT     // Undervoltage / overheat, cleared by button
 };
 
 // --- Networking Specs ---

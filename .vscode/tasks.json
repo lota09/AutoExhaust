@@ -1,0 +1,54 @@
+{
+  // arduino-cli tasks. All tasks act on the sketch folder of the file
+  // currently open in the editor (e.g. open AutoExhaust.ino, then run a task).
+  // Board (FQBN) and port come from that sketch's sketch.yaml.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ESP32: Build",
+      "type": "process",
+      "command": "arduino-cli",
+      "args": [
+        "compile",
+        "--build-path", "${workspaceFolder}/.build/${fileDirnameBasename}",
+        "${fileDirname}"
+      ],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "ESP32: Build & Upload (USB)",
+      "type": "process",
+      "command": "arduino-cli",
+      "args": [
+        "compile", "--upload",
+        "--build-path", "${workspaceFolder}/.build/${fileDirnameBasename}",
+        "${fileDirname}"
+      ],
+      "group": "build",
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "ESP32: Select Port",
+      "type": "process",
+      "command": "arduino-cli",
+      "args": ["board", "attach", "-p", "${input:port}", "${fileDirname}"],
+      "problemMatcher": []
+    },
+    {
+      "label": "ESP32: List Boards",
+      "type": "process",
+      "command": "arduino-cli",
+      "args": ["board", "list"],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "port",
+      "type": "promptString",
+      "description": "Serial port (see 'ESP32: List Boards')",
+      "default": "COM3"
+    }
+  ]
+}

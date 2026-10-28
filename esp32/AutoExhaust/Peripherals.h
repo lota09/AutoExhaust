@@ -3,29 +3,35 @@
 
 #include "Config.h"
 
-// --- Status LED Modes ---
-const int BLED_OFF = 0;
-const int BLED_BLINK = 1;
-const int BLED_ON = 2;
+// --- RGB LED Modes ---
+enum RgbMode {
+  RGB_OFF,
+  RGB_POWER,        // Color by 12V level
+  RGB_RAINBOW,      // Printing
+  RGB_BREATHE_BLUE, // Cooldown
+  RGB_PURPLE,       // Manual vent
+  RGB_ORANGE_BLINK, // Offline
+  RGB_RED_BLINK,    // Fault
+  RGB_CYAN,         // Button held: release = manual vent / clear fault
+  RGB_WHITE         // Button held: release = reboot
+};
 
 namespace Peripherals {
 void setup();
-void update_stateLED(SystemState state);
-void update_rgbLED(SystemState state, bool isRGBOverride);
+void update(); // Call every loop: ramps, kick-start, voltage sampling
 
-// PWM Controls
-void setFanSpeed(uint8_t speed);
-void setLightBrightness(uint8_t brightness);
-uint8_t getFanSpeed();
-uint8_t getLightBrightness();
+// Load Controls (limits enforced here; 0 = off)
+void setFan(uint8_t duty);
+void setLight(uint8_t duty);
+uint8_t getFanDuty();   // Actual output
+uint8_t getLightDuty(); // Actual output
 
-// Power & Thermal Monitoring
-float getPowerVoltage();
-void showPowerStatus(); // Set RGB color based on voltage
+// Power Monitoring
+float getPowerVoltage(); // Smoothed
 
-// RGB Effects
-void updateRainbow();
-void clearRGB();
+// Indicators
+void showRGB(RgbMode mode);
+void showWiFiStatus(bool wifiUp, bool mqttUp);
 } // namespace Peripherals
 
 #endif

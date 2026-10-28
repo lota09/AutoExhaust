@@ -1,0 +1,1 @@
+default_fqbn: esp32:esp32:makergo_c3_supermini:PartitionScheme=min_spiffs
