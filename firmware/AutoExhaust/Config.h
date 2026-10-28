@@ -68,7 +68,7 @@ const uint32_t PRINTER_STALE_MS = 60000;   // No report -> printer offline
 const uint32_t PUSHALL_QUIET_MS = 20000;   // Request full report if quiet
 const bool CHAMBER_LIGHT_SYNC = true; // Printer light on at start, off w/ strip
 
-// --- WiFi (Hardware_Test/WiFi_Stability results) ---
+// --- WiFi (hardware-tests/WiFi_Stability results) ---
 // 8.5 dBm was equal on the bench; final location RSSI is ~-77, so keep
 // more uplink margin
 const wifi_power_t WIFI_TX_POWER = WIFI_POWER_11dBm;

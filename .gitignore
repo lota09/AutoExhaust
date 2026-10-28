@@ -3,3 +3,5 @@ secrets.h
 build/
 **/.vscode/arduino.json
 version.h
+_archive/
+*/**/.vscode/

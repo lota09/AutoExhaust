@@ -3,7 +3,7 @@
 ## 1. 개요
 - 프린터(Bambu X1C)의 MQTT 상태를 받아서 배기팬과 LED 스트립을 자동으로 켜고 끕니다.
 - **동작 중에는 슬립을 사용하지 않습니다.** WiFi 라디오는 항상 켜져 있고(`WiFi.setSleep(false)`), TX 출력은 11dBm입니다.
-  - 근거는 `Hardware_Test/WiFi_Stability`의 측정 결과와 설치 위치의 RSSI입니다.
+  - 근거는 `hardware-tests/WiFi_Stability`의 측정 결과와 설치 위치의 RSSI입니다.
   - 예외는 FAULT 하나입니다. FAULT가 나면 deep sleep으로 들어가고 다시 깨어나지 않습니다.
 - 웹 대시보드(`/`)와 REST API(`/api/*`, [API.md](API.md))로 제어합니다.
 - 모든 수치(시간, 임계값, 상한)는 `Config.h` 한 곳에 모여 있습니다.
@@ -169,7 +169,7 @@ riscv32-esp-elf-addr2line -pfiaC -e .build/elf/<펌웨어 버전>.elf <pc> <ra>
 ```
 
 ## 7. 펌웨어 업데이트 (OTA 전용)
-- `esp32/AutoExhaust/ota.sh`가 컴파일, OTA 업로드, 검증 확인(`/api/status`)을 순서대로 합니다.
+- `firmware/AutoExhaust/ota.sh`가 컴파일, OTA 업로드, 검증 확인(`/api/status`)을 순서대로 합니다.
 - 새 펌웨어는 `pending_verify` 상태로 부팅합니다. WiFi와 웹/OTA가 정상인 상태로 60초가 지나면 `valid`로 확정됩니다.
 - 크래시가 나거나 3분 안에 정상 상태가 되지 못하면, 부트로더가 **이전 펌웨어로 자동 롤백**합니다. `./ota.sh --selftest-fail`로 시험할 수 있습니다.
 - 롤백으로 막지 못하는 경우: 검증을 통과한 뒤에 멈추는 코드. 이 경우는 loop watchdog이 재부팅하고, 반복되면 F3 FAULT로 이어집니다.
