@@ -25,12 +25,11 @@ h1{font-size:18px;margin:0;font-weight:650}
 .card h2{font-size:13px;font-weight:600;color:var(--sub);margin:0 0 12px;letter-spacing:.02em}
 .hero{display:flex;align-items:center;gap:14px}
 .dot{width:44px;height:44px;border-radius:50%;flex:none;background:#9ca3af}
-.st-RUNNING .dot{background:conic-gradient(red,#ff0,lime,cyan,blue,#f0f,red);animation:spin 4s linear infinite}
-.st-COOLDOWN .dot{background:#2563eb;animation:breathe 3s ease-in-out infinite}
+.st-RUNNING .dot{background:#16a34a}
+.st-COOLDOWN .dot{background:#06b6d4;animation:breathe 3s ease-in-out infinite}
 .st-MANUAL .dot{background:#8b2cf5}
 .st-OFFLINE .dot{background:#f97316;animation:blink 1s steps(1) infinite}
-.st-IDLE .dot{background:var(--track)}
-@keyframes spin{to{transform:rotate(1turn)}}
+.st-IDLE .dot{background:#2563eb}
 @keyframes breathe{50%{opacity:.15}}
 @keyframes blink{50%{opacity:.15}}
 .state{font-size:22px;font-weight:700}

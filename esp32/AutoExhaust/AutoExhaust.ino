@@ -50,12 +50,13 @@ void enterState(SystemState next) {
     cooldownStart = millis();
 
   // Printer light follows the print: on at start, off with the strip.
-  // Not re-sent after an OFFLINE blip, so a manual change on the printer
-  // is not overridden.
-  bool resumed = currentState == STATE_OFFLINE && offlinePrev == STATE_RUNNING;
-  if (next == STATE_RUNNING && !resumed) {
+  // Not re-sent when joining a print already in progress (boot mid-print or
+  // after an OFFLINE blip), so a manual change on the printer is kept.
+  bool resumed = currentState == STATE_BOOT ||
+                 (currentState == STATE_OFFLINE && offlinePrev == STATE_RUNNING);
+  if (next == STATE_RUNNING) {
     chamberLightOffSent = false;
-    if (CHAMBER_LIGHT_SYNC)
+    if (CHAMBER_LIGHT_SYNC && !resumed)
       Networking::setChamberLight(true);
   }
 
