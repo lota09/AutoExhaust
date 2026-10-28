@@ -13,6 +13,11 @@
 - [x] 웹 설정값 NVS 저장, REST API (`docs/API.md`)
 - [x] 파티션 Minimal SPIFFS (1.9MB APP): **USB로 1회 플래시 필요**
 
+## ✅ 2026-10-28 2차
+- [x] 버튼 10초 재부팅 제거 (기계식 스위치로 대체)
+- [x] OTA 자동 롤백 + `ota.sh` (롤백 시험 완료)
+- [x] 웹 UI 새로 작성: 2초 실시간 갱신, `/api/*` 기반, 라이트/다크 테마
+
 ## 🔍 실기 검증
 - [x] MQTT 인증 접속 (부팅 후 약 6초)
 - [x] 챔버 조명 `ledctrl` 명령 (프린터가 `lights_report`로 OFF/ON 확인)

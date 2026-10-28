@@ -1,5 +1,7 @@
 #include "Networking.h"
 #include "Peripherals.h"
+#include "WebUI.h"
+#include <esp_ota_ops.h>
 #include <stdarg.h>
 
 namespace Networking {
@@ -96,121 +98,9 @@ static const char *resetReasonName(esp_reset_reason_t r) {
   }
 }
 
-static String formatDuration(uint32_t ms) {
-  uint32_t s = ms / 1000;
-  char buf[24];
-  snprintf(buf, sizeof(buf), "%lud %02lu:%02lu:%02lu", s / 86400,
-           (s / 3600) % 24, (s / 60) % 60, s % 60);
-  return String(buf);
-}
-
 // --- Web -------------------------------------------------------------------
 
-void handleRoot() {
-  bool manual = strcmp(stateName, "MANUAL") == 0;
-  String html;
-  html.reserve(6000);
-  html =
-      "<!DOCTYPE html><html><head>"
-      "<meta charset='UTF-8'>"
-      "<meta name='viewport' content='width=device-width, initial-scale=1'>"
-      "<title>AutoExhaust Dashboard</title>";
-  html +=
-      "<style>"
-      "body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; "
-      "background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); "
-      "color: #e9ecef; text-align: center; margin: 0; padding: 20px; "
-      "min-height: 100vh; }"
-      ".container { max-width: 500px; margin: auto; background: rgba(255, 255, "
-      "255, 0.05); "
-      "padding: 30px; border-radius: 24px; backdrop-filter: blur(10px); "
-      "box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); border: 1px solid "
-      "rgba(255, 255, 255, 0.1); }"
-      "h1 { font-size: 2.2em; margin-bottom: 10px; background: "
-      "linear-gradient(to right, #4facfe 0%, #00f2fe 100%); "
-      "-webkit-background-clip: text; -webkit-text-fill-color: transparent; }"
-      ".status-card { background: rgba(0,0,0,0.2); padding: 15px; "
-      "border-radius: 15px; margin: 20px 0; border-left: 5px solid #4facfe; }"
-      ".status-card p { margin: 6px 0; }"
-      ".btn { display: inline-block; padding: 12px 30px; margin: 10px; "
-      "border-radius: 30px; border: none; "
-      "color: white; font-weight: bold; font-size: 1em; cursor: pointer; "
-      "transition: 0.3s; text-decoration: none; }"
-      ".on { background: linear-gradient(to right, #11998e, #38ef7d); "
-      "box-shadow: 0 4px 15px rgba(17,153,142,0.4); }"
-      ".off { background: linear-gradient(to right, #cb2d3e, #ef473a); "
-      "box-shadow: 0 4px 15px rgba(203,45,62,0.4); }"
-      ".btn:hover { transform: translateY(-2px); opacity: 0.9; }"
-      "input[type=range] { width: 80%; margin: 15px 0; }"
-      ".log-container { background: rgba(0,0,0,0.5); padding: 10px; "
-      "border-radius: 10px; margin-top: 20px; text-align: left; "
-      "font-family: monospace; font-size: 0.85em; color: #00f2fe; "
-      "max-height: 150px; overflow-y: auto; border: 1px solid "
-      "rgba(255,255,255,0.1); }"
-      "</style></head><body>";
-  html += "<div class='container'>";
-  html += "<h1>🌀 AutoExhaust 2.0</h1>";
-
-  html += "<div class='status-card'>";
-  html += "<p>System: <b style='color:#00f2fe;'>" + String(stateName) + "</b>";
-  if (stateRemainingMs)
-    html += " (" + formatDuration(stateRemainingMs) + " left)";
-  html += "</p>";
-  if (*faultReason)
-    html += "<p style='color:#e74c3c;'>⚠️ " + String(faultReason) +
-            " — hold button 2s to clear</p>";
-  html += "<p>🌀 Fan: " + String(Peripherals::getFanDuty() * 100 / 255) +
-          "% | 💡 Light: " + String(Peripherals::getLightDuty() * 100 / 255) +
-          "% | ⚡ " + String(Peripherals::getPowerVoltage(), 2) + " V</p>";
-  html += "</div>";
-
-  html += "<div class='status-card'>";
-  html += "<p>Printer: <b style='color:#00f2fe;'>" + lastStatus.state +
-          "</b> " + (isPrinterOnline() ? "" : "(offline)") + "</p>";
-  html += "<p>🌡️ Nozzle: " + String(lastStatus.nozzleTemp, 1) +
-          "°C | Bed: " + String(lastStatus.bedTemp, 1) + "°C</p>";
-  html += "<p>Chamber light: " +
-          String(lastStatus.chamberLightOn ? "ON" : "OFF") + "</p>";
-  html += "</div>";
-
-  html += "<div class='status-card'>";
-  html += "<p>📶 RSSI: " + String(WiFi.RSSI()) + " dBm | MQTT: " +
-          (mqttClient.connected() ? "UP" : "DOWN") + "</p>";
-  html += "<p>💻 ESP32: <span style='color:#f1c40f;'>" +
-          String(temperatureRead(), 1) + "°C</span> | Heap: " +
-          String(ESP.getFreeHeap() / 1024) + " KB</p>";
-  html += "<p>Uptime: " + formatDuration(millis()) + " | Reset: " +
-          resetReasonName(esp_reset_reason()) + "</p>";
-  html += "</div>";
-
-  html +=
-      "<hr style='border: 0; border-top: 1px solid rgba(255,255,255,0.1);'>";
-  html += "<h3>⚙️ System Control</h3>";
-  html += "<a href='/toggle'><button class='btn " +
-          String(manual ? "off" : "on") + "'>" +
-          (manual ? "Stop Manual Vent" : "Start Manual Vent") +
-          "</button></a>";
-  html += "<form action='/set' style='margin-top:20px;'>";
-  html += "<p>Fan Speed\n <input type='range' name='fan' min='" +
-          String(MIN_FAN_DUTY) + "' max='255' value='" + String(fanDuty) +
-          "'></p>";
-  html += "<p>Light Brightness\n <input type='range' name='light' min='0' "
-          "max='" +
-          String(MAX_LIGHT_DUTY) + "' value='" + String(lightDuty) + "'></p>";
-  html += "<input type='submit' value='Apply Changes' class='btn' "
-          "style='background:#555;'>";
-  html += "</form>";
-
-  html += "<div class='log-container'>";
-  for (int i = 0; i < MAX_LOG_ENTRIES; i++) {
-    int idx = (logIndex + i) % MAX_LOG_ENTRIES;
-    if (systemLogs[idx] != "") {
-      html += "<div>" + systemLogs[idx] + "</div>";
-    }
-  }
-  html += "</div></div></body></html>";
-  server.send(200, "text/html", html);
-}
+void handleRoot() { server.send_P(200, "text/html", WEB_UI); }
 
 static void applySettings(int fan, int light) {
   if (fan >= 0)
@@ -220,19 +110,6 @@ static void applySettings(int fan, int light) {
   prefs.putUChar("fan", fanDuty);
   prefs.putUChar("light", lightDuty);
   sysLog("Settings: fan %d, light %d\n", fanDuty, lightDuty);
-}
-
-void handleToggle() {
-  manualRequest = MANUAL_TOGGLE;
-  server.sendHeader("Location", "/");
-  server.send(303);
-}
-
-void handleSet() {
-  applySettings(server.hasArg("fan") ? server.arg("fan").toInt() : -1,
-                server.hasArg("light") ? server.arg("light").toInt() : -1);
-  server.sendHeader("Location", "/");
-  server.send(303);
 }
 
 // --- REST API (docs/API.md) -------------------------------------------------
@@ -278,6 +155,8 @@ static void addSettings(JsonObject obj) {
 void apiStatus() {
   JsonDocument doc;
   JsonObject sys = doc["system"].to<JsonObject>();
+  sys["firmware"] = FW_VERSION;
+  sys["firmware_state"] = firmwareState();
   sys["state"] = stateName;
   sys["remaining_s"] = stateRemainingMs / 1000;
   sys["fault"] = faultReason;
@@ -507,8 +386,6 @@ static void onWiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info) {
 
 static void beginServices() {
   server.on("/", handleRoot);
-  server.on("/toggle", handleToggle);
-  server.on("/set", handleSet);
   server.on("/api/status", HTTP_GET, apiStatus);
   server.on("/api/logs", HTTP_GET, apiLogs);
   server.on("/api/settings", HTTP_POST, apiSettings);
@@ -661,6 +538,20 @@ bool isMqttConnected() { return mqttClient.connected(); }
 bool isPrinterOnline() {
   return mqttClient.connected() && lastReportMs != 0 &&
          millis() - lastReportMs < PRINTER_STALE_MS;
+}
+
+bool servicesReady() { return servicesStarted; }
+
+const char *firmwareState() {
+  esp_ota_img_states_t imgState;
+  if (esp_ota_get_state_partition(esp_ota_get_running_partition(),
+                                  &imgState) != ESP_OK)
+    return "factory"; // Flashed over USB, no OTA state
+  switch (imgState) {
+  case ESP_OTA_IMG_PENDING_VERIFY: return "pending_verify";
+  case ESP_OTA_IMG_VALID: return "valid";
+  default: return "unknown";
+  }
 }
 
 const PrinterStatus &getPrinterStatus() { return lastStatus; }

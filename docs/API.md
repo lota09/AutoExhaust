@@ -4,7 +4,8 @@ Controls an exhaust fan and LED strip on a Bambu Lab X1C printer enclosure
 (ESP32-C3). The device switches loads automatically from the printer's MQTT
 state; this API reads its status and changes its settings.
 
-- **Base URL**: `http://autoexhaust.local` or `http://192.168.50.161` (LAN only)
+- **Base URL**: `http://autoexhaust.local` or `http://192.168.50.161` (LAN only).
+  `/` serves the web dashboard, which uses this same API.
 - **Format**: JSON request and response bodies, `Content-Type: application/json`
 - **Auth**: if the firmware is built with `SECRET_API_TOKEN`, every `POST`
   needs `Authorization: Bearer <token>`. `GET` never needs a token.
@@ -31,7 +32,7 @@ Full device state.
 
 ```json
 {
-  "system":   {"state": "RUNNING", "remaining_s": 0, "fault": "", "uptime_s": 3600,
+  "system":   {"firmware": "4f8ac8f-10281504", "firmware_state": "valid", "state": "RUNNING", "remaining_s": 0, "fault": "", "uptime_s": 3600,
                "reset_reason": "POWERON", "chip_temp_c": 45.2, "free_heap": 150000},
   "output":   {"fan_pct": 100, "light_pct": 70, "supply_v": 11.82},
   "settings": {"fan_pct": 100, "light_pct": 70, "fan_min_pct": 30, "light_max_pct": 70},

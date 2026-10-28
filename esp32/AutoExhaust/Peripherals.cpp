@@ -197,9 +197,6 @@ void showRGB(RgbMode mode) {
   case RGB_CYAN:
     writeRGB(0, 255, 255);
     break;
-  case RGB_WHITE:
-    writeRGB(255, 255, 255);
-    break;
   default:
     writeRGB(0, 0, 0);
     break;

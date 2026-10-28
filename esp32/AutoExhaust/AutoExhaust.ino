@@ -2,6 +2,11 @@
 #include "Networking.h"
 #include "Peripherals.h"
 #include <Arduino.h>
+#include <esp_ota_ops.h>
+
+// Keep new OTA images in PENDING_VERIFY until handleFirmwareVerify() confirms
+// them (the core would otherwise mark every image valid at boot)
+extern "C" bool verifyRollbackLater() { return true; }
 
 SystemState currentState = STATE_BOOT;
 uint32_t stateTimer = 0;     // When the current state was entered
@@ -15,6 +20,7 @@ bool isRGBOverride = false;
 uint32_t buttonHeldMs = 0;
 
 void handleButton();
+void handleFirmwareVerify();
 void handleFaults();
 void handleManualRequest(Networking::ManualRequest request);
 void runStateMachine();
@@ -76,12 +82,15 @@ void setup() {
   Networking::setup(); // Sets the time zone used by sysLog
   Networking::sysLog("=== System Booting ===\n");
   Networking::sysLog("CPU Frequency: %d MHz\n", getCpuFrequencyMhz());
+  Networking::sysLog("Firmware %s (%s)\n", FW_VERSION,
+                     Networking::firmwareState());
   stateTimer = millis();
 }
 
 void loop() {
   handleButton();
   Networking::update();
+  handleFirmwareVerify();
   handleManualRequest(Networking::takeManualRequest());
   handleFaults();
   runStateMachine();
@@ -204,6 +213,39 @@ void handleManualRequest(Networking::ManualRequest request) {
   }
 }
 
+void handleFirmwareVerify() {
+  static bool done = false;
+  if (done)
+    return;
+
+  esp_ota_img_states_t imgState;
+  if (esp_ota_get_state_partition(esp_ota_get_running_partition(),
+                                  &imgState) != ESP_OK ||
+      imgState != ESP_OTA_IMG_PENDING_VERIFY) {
+    done = true; // USB-flashed or already confirmed
+    return;
+  }
+
+#ifdef FW_SELFTEST_FAIL // Rollback test build: never healthy, fail fast
+  bool healthy = false;
+  uint32_t timeout = 30000;
+#else
+  bool healthy = Networking::isConnected() && Networking::servicesReady();
+  uint32_t timeout = FW_VERIFY_TIMEOUT_MS;
+#endif
+
+  if (healthy && millis() >= FW_VERIFY_MS) {
+    esp_ota_mark_app_valid_cancel_rollback();
+    Networking::sysLog("Firmware %s verified\n", FW_VERSION);
+    done = true;
+  } else if (millis() >= timeout) {
+    Networking::sysLog("Firmware %s unhealthy -> rollback\n", FW_VERSION);
+    delay(200);
+    esp_ota_mark_app_invalid_rollback_and_reboot();
+    done = true; // Only reached if there is no image to roll back to
+  }
+}
+
 void handleFaults() {
   uint32_t now = millis();
 
@@ -237,8 +279,8 @@ void handleFaults() {
 }
 
 void handleButton() {
-  // Actions fire on release, so a reboot never happens while GPIO9
-  // (strapping pin) is held. A press already held at boot is ignored.
+  // Actions fire on release. A press already held at boot (GPIO9 is a
+  // strapping pin) is ignored.
   static bool stable = LOW;
   static bool lastRaw = LOW;
   static bool armed = false;
@@ -259,12 +301,7 @@ void handleButton() {
     } else if (!armed) {
       armed = true;
     } else {
-      uint32_t held = now - pressStart;
-      if (held >= BUTTON_REBOOT_MS) {
-        Networking::sysLog("Button: reboot\n");
-        delay(200);
-        ESP.restart();
-      } else if (held >= BUTTON_LONG_MS) {
+      if (now - pressStart >= BUTTON_LONG_MS) {
         if (currentState == STATE_FAULT) {
           Networking::sysLog("Button: fault cleared\n");
           faultReason = "";
@@ -290,9 +327,7 @@ void updateIndicators() {
                               Networking::isMqttConnected());
 
   RgbMode mode;
-  if (buttonHeldMs >= BUTTON_REBOOT_MS)
-    mode = RGB_WHITE;
-  else if (buttonHeldMs >= BUTTON_LONG_MS)
+  if (buttonHeldMs >= BUTTON_LONG_MS)
     mode = RGB_CYAN;
   else if (isRGBOverride)
     mode = RGB_POWER;

@@ -30,6 +30,8 @@ void sysLog(const char *format, ...);
 bool isConnected();      // WiFi
 bool isMqttConnected();  // MQTT session
 bool isPrinterOnline();  // MQTT up and reports are fresh
+bool servicesReady();    // Web server + OTA started
+const char *firmwareState(); // OTA image state of the running app
 
 // Status Access
 const PrinterStatus &getPrinterStatus();

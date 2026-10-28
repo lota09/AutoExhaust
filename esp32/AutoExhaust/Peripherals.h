@@ -12,8 +12,7 @@ enum RgbMode {
   RGB_PURPLE,       // Manual vent
   RGB_ORANGE_BLINK, // Offline
   RGB_RED_BLINK,    // Fault
-  RGB_CYAN,         // Button held: release = manual vent / clear fault
-  RGB_WHITE         // Button held: release = reboot
+  RGB_CYAN          // Button held: release = manual vent / clear fault
 };
 
 namespace Peripherals {
