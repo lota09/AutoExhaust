@@ -25,6 +25,8 @@ struct PrinterStatus {
 void setup();
 void update();
 void sysLog(const char *format, ...);
+String recentLogs(int lines); // Last N log lines, '\n'-joined
+const char *resetReasonName(esp_reset_reason_t r);
 
 // Connectivity
 bool isConnected();      // WiFi
@@ -38,7 +40,7 @@ const PrinterStatus &getPrinterStatus();
 bool setChamberLight(bool on);
 
 // Dashboard info from the state machine
-void setStateInfo(const char *name, uint32_t remainingMs, const char *fault);
+void setStateInfo(const char *name, uint32_t remainingMs);
 enum ManualRequest { MANUAL_NONE, MANUAL_OFF, MANUAL_ON, MANUAL_TOGGLE };
 ManualRequest takeManualRequest(); // Web/API request, cleared on read
 

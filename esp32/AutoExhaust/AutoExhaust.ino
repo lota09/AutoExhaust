@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Networking.h"
 #include "Peripherals.h"
+#include "Safety.h"
 #include <Arduino.h>
 #include <esp_ota_ops.h>
 
@@ -13,7 +14,6 @@ uint32_t stateTimer = 0;     // When the current state was entered
 uint32_t cooldownStart = 0;  // Survives OFFLINE so cooldown can resume
 SystemState offlinePrev = STATE_IDLE;
 bool chamberLightOffSent = true;
-const char *faultReason = "";
 
 uint32_t overrideTimer = 0;
 bool isRGBOverride = false;
@@ -34,7 +34,6 @@ const char *stateName(SystemState s) {
   case STATE_COOLDOWN: return "COOLDOWN";
   case STATE_MANUAL: return "MANUAL";
   case STATE_OFFLINE: return "OFFLINE";
-  case STATE_FAULT: return "FAULT";
   }
   return "?";
 }
@@ -64,15 +63,6 @@ void enterState(SystemState next) {
   stateTimer = millis();
 }
 
-void setFault(const char *reason) {
-  if (currentState == STATE_FAULT)
-    return;
-  faultReason = reason;
-  Networking::sysLog("!!! FAULT: %s !!! Loads off, hold button 2s to clear\n",
-                     reason);
-  enterState(STATE_FAULT);
-}
-
 void setup() {
   Serial.begin(115200);
   // USB plugged in without a terminal: drop logs instead of blocking loop()
@@ -84,6 +74,7 @@ void setup() {
   Networking::sysLog("CPU Frequency: %d MHz\n", getCpuFrequencyMhz());
   Networking::sysLog("Firmware %s (%s)\n", FW_VERSION,
                      Networking::firmwareState());
+  Safety::setup(); // May enter a crash-loop FAULT
   stateTimer = millis();
 }
 
@@ -91,6 +82,7 @@ void loop() {
   handleButton();
   Networking::update();
   handleFirmwareVerify();
+  Safety::update();
   handleManualRequest(Networking::takeManualRequest());
   handleFaults();
   runStateMachine();
@@ -185,14 +177,11 @@ void runStateMachine() {
     }
     break;
   }
-
-  case STATE_FAULT:
-    break; // Loads off until cleared by button
   }
 
   Peripherals::setFan(fan ? Networking::fanDuty : 0);
   Peripherals::setLight(light ? Networking::lightDuty : 0);
-  Networking::setStateInfo(stateName(currentState), remaining, faultReason);
+  Networking::setStateInfo(stateName(currentState), remaining);
 }
 
 void handleManualRequest(Networking::ManualRequest request) {
@@ -202,9 +191,7 @@ void handleManualRequest(Networking::ManualRequest request) {
   bool wantOn = request == Networking::MANUAL_ON ||
                 (request == Networking::MANUAL_TOGGLE && !isManual);
 
-  if (currentState == STATE_FAULT) {
-    Networking::sysLog("Manual vent ignored: FAULT active\n");
-  } else if (wantOn && currentState == STATE_RUNNING) {
+  if (wantOn && currentState == STATE_RUNNING) {
     Networking::sysLog("Manual vent ignored: already printing\n");
   } else if (wantOn && !isManual) {
     enterState(STATE_MANUAL);
@@ -259,7 +246,7 @@ void handleFaults() {
     if (lowSince == 0)
       lowSince = now;
     else if (now - lowSince > VOLT_FAULT_MS)
-      setFault("Undervoltage");
+      Safety::enterFault(FAULT_UNDERVOLTAGE, v);
   } else {
     lowSince = 0;
   }
@@ -270,7 +257,7 @@ void handleFaults() {
     lastThermalCheck = now;
     float temp = temperatureRead();
     if (temp > THERMAL_LIMIT_CRITICAL) {
-      setFault("Chip overheat");
+      Safety::enterFault(FAULT_OVERHEAT, temp);
     } else if (temp > THERMAL_LIMIT_WARM && now - lastWarnLog > 60000) {
       lastWarnLog = now;
       Networking::sysLog("Warning: High chip temp (%.1f)\n", temp);
@@ -302,13 +289,7 @@ void handleButton() {
       armed = true;
     } else {
       if (now - pressStart >= BUTTON_LONG_MS) {
-        if (currentState == STATE_FAULT) {
-          Networking::sysLog("Button: fault cleared\n");
-          faultReason = "";
-          enterState(STATE_BOOT);
-        } else {
-          handleManualRequest(Networking::MANUAL_TOGGLE);
-        }
+        handleManualRequest(Networking::MANUAL_TOGGLE);
       } else {
         isRGBOverride = true;
         overrideTimer = now;
@@ -338,7 +319,6 @@ void updateIndicators() {
     case STATE_COOLDOWN: mode = RGB_BREATHE_BLUE; break;
     case STATE_MANUAL: mode = RGB_PURPLE; break;
     case STATE_OFFLINE: mode = RGB_ORANGE_BLINK; break;
-    case STATE_FAULT: mode = RGB_RED_BLINK; break;
     default: mode = RGB_OFF; break;
     }
   }

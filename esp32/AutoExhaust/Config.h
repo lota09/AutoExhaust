@@ -75,17 +75,23 @@ const wifi_power_t WIFI_TX_POWER = WIFI_POWER_11dBm;
 const uint32_t WIFI_RETRY_AFTER = 30000;    // Kick reconnect after 30 s down
 const uint32_t WIFI_RESTART_AFTER = 300000; // Reboot after 5 min down
 
+// --- Runtime Safety ---
+const uint32_t LOOP_WDT_MS = 60000; // loop() stuck -> panic reboot (> OTA upload)
+const uint8_t CRASH_LOOP_COUNT = 3; // Crashes within the window -> FAULT
+const uint32_t CRASH_LOOP_WINDOW_MS = 10 * 60000UL;
+const int FAULT_LOG_LINES = 20; // Log tail saved with a fault
+
 // --- Power Monitor (thresholds: re-measure under full load) ---
 const float DIVIDER_RATIO = 6.0;  // (100k + 20k) / 20k
 const float VOLT_PRESENT = 5.0;   // Below: 12V off (USB only), not a fault
 const float VOLT_GOOD = 11.6;     // RGB green above
 const float VOLT_LOW = 11.0;      // RGB yellow above, red below
-const float VOLT_FAULT = 10.5;    // Latching fault while loads are on
+const float VOLT_FAULT = 10.5;    // FAULT while loads are on
 const uint32_t VOLT_FAULT_MS = 2000;
 
 // --- Button ---
 const uint32_t BUTTON_DEBOUNCE_MS = 30;
-const uint32_t BUTTON_LONG_MS = 2000; // Release: manual vent / clear fault
+const uint32_t BUTTON_LONG_MS = 2000; // Release: manual vent toggle
 
 // --- Logic Constants ---
 const int DEFAULT_CPU_FREQ =
@@ -93,7 +99,7 @@ const int DEFAULT_CPU_FREQ =
 const uint32_t STATUS_LOG_INTERVAL = 60000;  // Periodic status log
 const uint32_t RGB_OVERRIDE_DURATION = 5000; // 5 seconds
 const float THERMAL_LIMIT_WARM = 65.0;       // Warning log only
-const float THERMAL_LIMIT_CRITICAL = 80.0;   // Latching fault
+const float THERMAL_LIMIT_CRITICAL = 80.0;   // FAULT
 const int MAX_LOG_ENTRIES = 50;              // Max logs displayed in web UI
 
 // --- System States ---
@@ -103,9 +109,8 @@ enum SystemState {
   STATE_RUNNING,  // Printing
   STATE_COOLDOWN, // Run-on after print
   STATE_MANUAL,   // Manual vent
-  STATE_OFFLINE,  // WiFi / MQTT lost
-  STATE_FAULT     // Undervoltage / overheat, cleared by button
-};
+  STATE_OFFLINE   // WiFi / MQTT lost
+};                // Faults never return: see Safety.h
 
 // --- Networking Specs ---
 const int WEB_SERVER_PORT = 80;

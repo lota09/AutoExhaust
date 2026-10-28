@@ -11,8 +11,7 @@ enum RgbMode {
   RGB_BREATHE_BLUE, // Cooldown
   RGB_PURPLE,       // Manual vent
   RGB_ORANGE_BLINK, // Offline
-  RGB_RED_BLINK,    // Fault
-  RGB_CYAN          // Button held: release = manual vent / clear fault
+  RGB_CYAN          // Button held: release = manual vent
 };
 
 namespace Peripherals {
@@ -31,6 +30,9 @@ float getPowerVoltage(); // Smoothed
 // Indicators
 void showRGB(RgbMode mode);
 void showWiFiStatus(bool wifiUp, bool mqttUp);
+
+// Deep sleep: loads low, RGB on/off per channel, built-in LED off
+void holdForSleep(bool r, bool g, bool b);
 } // namespace Peripherals
 
 #endif

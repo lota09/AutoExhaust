@@ -29,14 +29,17 @@ h1{font-size:18px;margin:0;font-weight:650}
 .st-COOLDOWN .dot{background:#2563eb;animation:breathe 3s ease-in-out infinite}
 .st-MANUAL .dot{background:#8b2cf5}
 .st-OFFLINE .dot{background:#f97316;animation:blink 1s steps(1) infinite}
-.st-FAULT .dot{background:#dc2626;animation:blink .25s steps(1) infinite}
 .st-IDLE .dot{background:var(--track)}
 @keyframes spin{to{transform:rotate(1turn)}}
 @keyframes breathe{50%{opacity:.15}}
 @keyframes blink{50%{opacity:.15}}
 .state{font-size:22px;font-weight:700}
 .desc{color:var(--sub);font-size:13px}
-.fault{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad);font-size:13px}
+.alert{border-color:var(--bad);border-width:2px}
+.alert h2{color:var(--bad)}
+.alert.crash{border-color:var(--warn)}.alert.crash h2{color:var(--warn)}
+.alert p{margin:0 0 6px}
+.alert button{margin-top:10px;width:100%}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat{background:var(--bg);border-radius:10px;padding:10px}
 .stat b{display:block;font-size:19px;font-weight:650}
@@ -68,10 +71,20 @@ footer{text-align:center;color:var(--sub);font-size:12px;margin:8px 0 24px}
 </style></head><body><main>
 <header><h1>AutoExhaust</h1><div class="conn" id="conn"><i></i><span>연결 중</span></div></header>
 
+<section class="card alert" id="faultCard" hidden><h2>지난 FAULT — 장치가 이 원인으로 멈췄었습니다</h2>
+ <p id="faultInfo"></p><div class="desc" id="faultMeta"></div>
+ <details><summary>멈추기 직전 로그</summary><pre id="faultLogs"></pre></details>
+ <button class="ack">확인 (기록 지우기)</button>
+</section>
+
+<section class="card alert crash" id="crashCard" hidden><h2>지난 크래시 — 자동 재시작으로 복구됨</h2>
+ <p id="crashInfo"></p><div class="desc" id="crashMeta"></div>
+ <button class="ack">확인 (기록 지우기)</button>
+</section>
+
 <section class="card" id="hero">
  <div class="hero"><div class="dot"></div>
   <div><div class="state" id="state">-</div><div class="desc" id="desc">불러오는 중</div></div></div>
- <div class="fault" id="fault"></div>
 </section>
 
 <section class="card"><h2>출력</h2>
@@ -114,8 +127,10 @@ footer{text-align:center;color:var(--sub);font-size:12px;margin:8px 0 24px}
 const $=id=>document.getElementById(id);
 const STATES={BOOT:["시작 중","프린터 상태를 기다리는 중"],IDLE:["대기","프린터가 쉬는 중"],
 RUNNING:["출력 중","팬·조명 가동"],COOLDOWN:["쿨다운","출력 후 남은 연기 배출"],
-MANUAL:["수동 환기","프린터와 무관하게 가동"],OFFLINE:["연결 끊김","프린터 상태를 알 수 없음"],
-FAULT:["오류","부하 차단됨"]};
+MANUAL:["수동 환기","프린터와 무관하게 가동"],OFFLINE:["연결 끊김","프린터 상태를 알 수 없음"]};
+const FAULTS={"Chip overheat":["칩 과열","°C","빨강"],"Undervoltage":["저전압","V","노랑"],
+"Crash loop":["크래시 반복","회","흰색"]};
+const when=t=>t?new Date(t*1000).toLocaleString("ko-KR"):"시각 미상(시간 동기화 전)";
 let token="",last=null,editUntil=0;
 try{token=localStorage.getItem("token")||""}catch(e){}
 
@@ -140,14 +155,21 @@ function render(d){
  $("hero").className="card st-"+s.state;
  $("state").textContent=st[0];
  $("desc").textContent=s.remaining_s?`${st[1]} · ${dur(s.remaining_s)} 남음`:st[1];
- const f=$("fault");f.style.display=s.fault?"block":"none";
- f.textContent=s.fault?`${s.fault} — 원인을 확인한 뒤 장치 버튼을 2초 눌렀다 떼면 해제됩니다.`:"";
+ const lf=s.last_fault,lc=s.last_crash;
+ $("faultCard").hidden=!lf;
+ if(lf){const k=FAULTS[lf.reason]||[lf.reason,"",""];
+  $("faultInfo").textContent=`${k[0]} (${lf.value}${k[1]}) — RGB ${k[2]} 고정 상태로 잠들었다가 전원 재투입으로 복구`;
+  $("faultMeta").textContent=`${when(lf.time)} · 가동 ${dur(lf.uptime_s)} 시점 · 펌웨어 ${lf.firmware}`;
+  $("faultLogs").textContent=lf.logs}
+ $("crashCard").hidden=!lc;
+ if(lc){$("crashInfo").textContent=`${lc.reset_reason}${lc.task?` · 태스크 ${lc.task} · PC ${lc.pc} · RA ${lc.ra}`:""}`;
+  $("crashMeta").textContent=`${when(lc.time)} · 펌웨어 ${lc.firmware}`}
  $("fan").textContent=o.fan_pct+"%";$("fanBar").style.width=o.fan_pct+"%";
  $("light").textContent=o.light_pct+"%";$("lightBar").style.width=o.light_pct+"%";
  $("volt").textContent=o.supply_v<5?"없음":o.supply_v.toFixed(2)+"V";
  const m=$("manual"),manual=s.state==="MANUAL";
  m.textContent=manual?"수동 환기 중지":"수동 환기 시작";m.classList.toggle("stop",manual);
- m.disabled=s.state==="FAULT"||s.state==="RUNNING";
+ m.disabled=s.state==="RUNNING";
  if(Date.now()>editUntil){
   $("fanSet").min=d.settings.fan_min_pct;$("lightSet").max=d.settings.light_max_pct;
   $("fanSet").value=d.settings.fan_pct;$("lightSet").value=d.settings.light_pct;showSet()}
@@ -181,6 +203,7 @@ $("manual").onclick=()=>act(()=>api("manual",{on:last.system.state!=="MANUAL"}))
 $("chamber").onclick=()=>act(()=>api("chamber_light",{on:!last.printer.chamber_light}),"프린터에 전송했습니다");
 $("reboot").onclick=()=>{if(confirm("장치를 재부팅할까요? 약 10초 뒤 다시 연결됩니다."))
  act(()=>api("reboot",{}),"재부팅 중")};
+for(const b of document.querySelectorAll(".ack"))b.onclick=()=>act(()=>api("fault/ack",{}),"기록을 지웠습니다");
 $("logBox").ontoggle=()=>{if($("logBox").open)loadLogs()};
 poll();setInterval(poll,2000);
 </script></body></html>)rawliteral";

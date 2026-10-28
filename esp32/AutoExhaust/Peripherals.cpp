@@ -1,4 +1,5 @@
 #include "Peripherals.h"
+#include <driver/gpio.h>
 #include <math.h>
 
 namespace Peripherals {
@@ -14,7 +15,15 @@ static uint32_t lastRampMs = 0;
 
 static float voltage = 0;
 
+static const int HELD_PINS[] = {PIN_FAN, PIN_LIGHT, PIN_RGB_R,
+                                 PIN_RGB_G, PIN_RGB_B, PIN_BUILTIN};
+
 void setup() {
+  // Release pads held by a previous fault sleep
+  gpio_deep_sleep_hold_dis();
+  for (int pin : HELD_PINS)
+    gpio_hold_dis((gpio_num_t)pin);
+
   // Built-in LED (Low-Active on C3 SuperMini)
   pinMode(PIN_BUILTIN, OUTPUT);
   digitalWrite(PIN_BUILTIN, HIGH); // Start with OFF (HIGH = OFF)
@@ -188,12 +197,6 @@ void showRGB(RgbMode mode) {
     else
       writeRGB(0, 0, 0);
     break;
-  case RGB_RED_BLINK: // 4 Hz
-    if ((now / 125) % 2)
-      writeRGB(255, 0, 0);
-    else
-      writeRGB(0, 0, 0);
-    break;
   case RGB_CYAN:
     writeRGB(0, 255, 255);
     break;
@@ -201,6 +204,20 @@ void showRGB(RgbMode mode) {
     writeRGB(0, 0, 0);
     break;
   }
+}
+
+void holdForSleep(bool r, bool g, bool b) {
+  // PWM stops in deep sleep: switch to plain GPIO levels and latch the pads
+  const bool levels[] = {LOW, LOW, r, g, b, HIGH}; // Built-in: HIGH = off
+  for (int i = 0; i < 6; i++) {
+    int pin = HELD_PINS[i];
+    if (pin != PIN_BUILTIN)
+      ledcDetach(pin);
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, levels[i]);
+    gpio_hold_en((gpio_num_t)pin);
+  }
+  gpio_deep_sleep_hold_en();
 }
 
 void showWiFiStatus(bool wifiUp, bool mqttUp) {

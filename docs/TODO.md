@@ -18,6 +18,13 @@
 - [x] OTA 자동 롤백 + `ota.sh` (롤백 시험 완료)
 - [x] 웹 UI 새로 작성: 2초 실시간 갱신, `/api/*` 기반, 라이트/다크 테마
 
+## ✅ 2026-10-28 3차: FAULT / 런타임 안전
+- [x] FAULT를 종료 상태로 변경: 저전압·칩 과열·크래시 반복 → 기록 저장 + RGB 원인색 고정 + deep sleep, 전원을 다시 넣어야 복구
+- [x] NVS에 FAULT 기록 저장(원인·값·시각·로그 20줄), 웹 UI "지난 FAULT"·"지난 크래시" 카드
+- [x] loop watchdog 60초, coredump 요약(태스크·PC·RA), 버전별 ELF 보관
+- [x] 크래시 테스트·hang 테스트 통과 (주소를 소스 줄까지 해석함)
+- [ ] **실기 확인 필요**: FAULT deep sleep 중 RGB 색 고정이 실제로 유지되는지, 부하 핀이 LOW로 유지되는지
+
 ## 🔍 실기 검증
 - [x] MQTT 인증 접속 (부팅 후 약 6초)
 - [x] 챔버 조명 `ledctrl` 명령 (프린터가 `lights_report`로 OFF/ON 확인)

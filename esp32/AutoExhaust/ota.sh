@@ -45,6 +45,11 @@ if ! arduino-cli compile --fqbn $FQBN --output-dir $OUT . 2>&1 |
   grep -iE "warning|error|바이트|bytes"; then :; fi
 [ ${PIPESTATUS[0]} -eq 0 ] || { echo "Compile failed"; exit 1; }
 
+# Keep the ELF of every flashed build: decodes crash PC/RA later with
+# riscv32-esp-elf-addr2line -pfiaC -e <elf> <pc> <ra>
+mkdir -p ../../.build/elf
+cp $OUT/AutoExhaust.ino.elf "../../.build/elf/$VERSION.elf"
+
 echo "== Upload"
 PW=$(sed -n 's/.*SECRET_OTA_PASS *"\(.*\)".*/\1/p' secrets.h)
 arduino-cli upload --fqbn $FQBN --protocol network -p "$IP" \

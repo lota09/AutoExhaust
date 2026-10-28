@@ -1,5 +1,6 @@
 #include "Networking.h"
 #include "Peripherals.h"
+#include "Safety.h"
 #include "WebUI.h"
 #include <esp_ota_ops.h>
 #include <stdarg.h>
@@ -23,7 +24,10 @@ static ManualRequest manualRequest = MANUAL_NONE;
 static uint32_t rebootRequestedMs = 0; // Reboot after the response is sent
 static const char *stateName = "BOOT";
 static uint32_t stateRemainingMs = 0;
-static const char *faultReason = "";
+enum TestAction { TEST_NONE, TEST_FAULT, TEST_CRASH, TEST_HANG };
+static TestAction testAction = TEST_NONE; // Run after the response is sent
+static FaultReason testFault = FAULT_OVERHEAT;
+static uint32_t testRequestedMs = 0;
 
 // WiFi link tracking: written by the WiFi event task, read by loop()
 static portMUX_TYPE linkMux = portMUX_INITIALIZER_UNLOCKED;
@@ -84,7 +88,7 @@ void sysLog(const char *format, ...) {
   }
 }
 
-static const char *resetReasonName(esp_reset_reason_t r) {
+const char *resetReasonName(esp_reset_reason_t r) {
   switch (r) {
   case ESP_RST_POWERON: return "POWERON";
   case ESP_RST_SW: return "SW";
@@ -159,7 +163,7 @@ void apiStatus() {
   sys["firmware_state"] = firmwareState();
   sys["state"] = stateName;
   sys["remaining_s"] = stateRemainingMs / 1000;
-  sys["fault"] = faultReason;
+  Safety::addRecords(sys);
   sys["uptime_s"] = millis() / 1000;
   sys["reset_reason"] = resetReasonName(esp_reset_reason());
   sys["chip_temp_c"] = serialized(String(temperatureRead(), 1));
@@ -258,6 +262,74 @@ void apiReboot() {
   doc["note"] = "rebooting in 1 s";
   sendJson(200, doc);
   rebootRequestedMs = millis();
+}
+
+void apiFaultAck() {
+  JsonDocument body;
+  if (!beginPost(body))
+    return;
+  Safety::acknowledge();
+  JsonDocument doc;
+  doc["ok"] = true;
+  sendJson(200, doc);
+}
+
+// Verification only: triggers a real fault (deep sleep), panic or hang
+void apiTest() {
+  JsonDocument body;
+  if (!beginPost(body))
+    return;
+  String action = body["action"] | "";
+  if (action == "fault_overheat" || action == "fault_undervoltage" ||
+      action == "fault_crash_loop") {
+    testAction = TEST_FAULT;
+    testFault = action == "fault_overheat"       ? FAULT_OVERHEAT
+                : action == "fault_undervoltage" ? FAULT_UNDERVOLTAGE
+                                                 : FAULT_CRASH_LOOP;
+  } else if (action == "crash") {
+    testAction = TEST_CRASH;
+  } else if (action == "hang") {
+    testAction = TEST_HANG;
+  } else {
+    sendError(400, "action: fault_overheat | fault_undervoltage | "
+                   "fault_crash_loop | crash | hang");
+    return;
+  }
+  sysLog("TEST requested: %s\n", action.c_str());
+  testRequestedMs = millis();
+  JsonDocument doc;
+  doc["ok"] = true;
+  doc["note"] = "runs in 1 s";
+  sendJson(200, doc);
+}
+
+static void runTestAction() {
+  if (testAction == TEST_NONE || millis() - testRequestedMs < 1000)
+    return;
+  switch (testAction) {
+  case TEST_FAULT:
+    Safety::enterFault(testFault, 0);
+  case TEST_CRASH:
+    abort(); // Panic -> core dump -> reboot
+  case TEST_HANG:
+    while (true) { // Loop watchdog must reboot after LOOP_WDT_MS
+    }
+  default:
+    break;
+  }
+}
+
+String recentLogs(int lines) {
+  String out;
+  for (int i = MAX_LOG_ENTRIES - lines; i < MAX_LOG_ENTRIES; i++) {
+    int idx = (logIndex + i) % MAX_LOG_ENTRIES;
+    if (systemLogs[idx] == "")
+      continue;
+    if (out.length())
+      out += '\n';
+    out += systemLogs[idx];
+  }
+  return out;
 }
 
 // --- MQTT ------------------------------------------------------------------
@@ -392,6 +464,8 @@ static void beginServices() {
   server.on("/api/manual", HTTP_POST, apiManual);
   server.on("/api/chamber_light", HTTP_POST, apiChamberLight);
   server.on("/api/reboot", HTTP_POST, apiReboot);
+  server.on("/api/fault/ack", HTTP_POST, apiFaultAck);
+  server.on("/api/test", HTTP_POST, apiTest);
   server.onNotFound([]() { sendError(404, "see docs/API.md"); });
   const char *headers[] = {"Authorization"};
   server.collectHeaders(headers, 1);
@@ -509,6 +583,7 @@ void update() {
 
   if (rebootRequestedMs && millis() - rebootRequestedMs > 1000)
     ESP.restart();
+  runTestAction();
 
   if (isConnected()) {
     server.handleClient();
@@ -556,10 +631,9 @@ const char *firmwareState() {
 
 const PrinterStatus &getPrinterStatus() { return lastStatus; }
 
-void setStateInfo(const char *name, uint32_t remainingMs, const char *fault) {
+void setStateInfo(const char *name, uint32_t remainingMs) {
   stateName = name;
   stateRemainingMs = remainingMs;
-  faultReason = fault;
 }
 
 ManualRequest takeManualRequest() {
